@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "/Users/fjmpiq/Downloads/ProyectosParte1/RichASR/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-v26/values-v26.xml",
+            "outputFile": "/Users/zoraida/Documents/Proyectos Android/TalkBack/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-v26/values-v26.xml",
             "map": [
                 {
-                    "source": "/Users/fjmpiq/.gradle/caches/transforms-1/files-1.1/appcompat-v7-28.0.0.aar/d88932feabcd1790fd0bc6cf4bbc930e/res/values-v26/values-v26.xml",
+                    "source": "/Users/zoraida/.gradle/caches/transforms-1/files-1.1/appcompat-v7-28.0.0.aar/1625fb67c561433aac774080fe6ad806/res/values-v26/values-v26.xml",
                     "from": {
                         "startLines": "2,3,4,8,12,16",
                         "startColumns": "4,4,4,4,4,4",

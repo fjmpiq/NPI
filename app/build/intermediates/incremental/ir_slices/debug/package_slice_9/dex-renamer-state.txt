@@ -1,4 +1,4 @@
-#Mon Oct 01 13:04:44 CEST 2018
-base.0=/Users/fjmpiq/Downloads/ProyectosParte1/RichASR/app/build/intermediates/transforms/dexMerger/debug/10
+#Tue Oct 02 17:44:46 CEST 2018
+base.0=/Users/zoraida/Documents/Proyectos Android/TalkBack/app/build/intermediates/transforms/dexMerger/debug/9
 path.0=classes.dex
 renamed.0=classes.dex
