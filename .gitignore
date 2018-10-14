@@ -1,3 +1,6 @@
+#sdk config file
+app/build.gradle
+
 #built application files
 *.apk
 *.ap_
