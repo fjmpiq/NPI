@@ -17,9 +17,15 @@ export default (request, response) => {
     // Set the headers the way you like
     response.headers['X-Custom-Header'] = 'CustomHeaderValue';
     
+    // Función que determina si la página de Wikidata con un cierto título (QXXXXX) es una obra de arte
+    function isArt(title){
+        return true;
+    }
+    
     // Esta función es la que debe seleccionar uno de los resultados de la búsqueda
     function selectResult(results){
-        return results[0].title
+        // Devuelve el primer título que corresponde a una obra de arte
+        return results.map((r) => {return r.title}).find(isArt)
     }
     
     let any = JSON.parse(request.body).queryResult.parameters.any;
