@@ -17,11 +17,6 @@ export default (request, response) => {
     // Set the headers the way you like
     response.headers['X-Custom-Header'] = 'CustomHeaderValue';
     
-    // Función que genera la URL de la búsqueda en Wikidata a partir del término de búsqueda
-    function searchURL(any){
-        return "https://www.wikidata.org/w/api.php?action=query&list=search&format=json&srsearch=mona+lisa"
-    }
-    
     // Esta función es la que debe seleccionar uno de los resultados de la búsqueda
     function selectResult(results){
         return results[0].title
@@ -29,7 +24,7 @@ export default (request, response) => {
     
     let any = JSON.parse(request.body).queryResult.parameters.any;
     
-    return xhr.fetch(searchURL(any)).then((x) => {
+    return xhr.fetch("https://www.wikidata.org/w/api.php?action=query&list=search&format=json&srsearch=" + any.split(" ").join("+")).then((x) => {
         // handle server response
         let result = selectResult(JSON.parse(x.body).query.search);
         return response.send({"fulfillmentText":result});
