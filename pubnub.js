@@ -17,6 +17,15 @@ export default (request, response) => {
     // Set the headers the way you like
     response.headers['X-Custom-Header'] = 'CustomHeaderValue';
     
+    // Mapa de las funciones que gestionan cada intent
+    let intentMap = new Map();
+    intentMap.set('ObraRelacionada', obraRelacionada);
+    
+    // Función que gestiona el intent ObraRelacionada
+    function obraRelacionada(title){
+        return title
+    }
+    
     // Función que determina si la página de Wikidata con un cierto título (QXXXXX) es una obra de arte
     function isArt(title){
         return true;
@@ -29,11 +38,12 @@ export default (request, response) => {
     }
     
     let any = JSON.parse(request.body).queryResult.parameters.any;
+    let intent = JSON.parse(request.body).queryResult.intent.displayName;
     
     return xhr.fetch("https://www.wikidata.org/w/api.php?action=query&list=search&format=json&srsearch=" + any.split(" ").join("+")).then((x) => {
         // handle server response
         let result = selectResult(JSON.parse(x.body).query.search);
-        return response.send({"fulfillmentText":result});
+        return response.send({"fulfillmentText":intentMap.get(intent)(result)});
     }).catch((err) => {
         // handle request failure
         return response.send("Malformed JSON body.");
