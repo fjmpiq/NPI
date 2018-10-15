@@ -28,7 +28,15 @@ export default (request, response) => {
     
     // Función que determina si la página de Wikidata con un cierto título (QXXXXX) es una obra de arte
     function isArt(title){
-        return true;
+        return xhr.fetch("https://www.wikidata.org/wiki/Special:EntityData/"+title+".json").then((x) => {
+            // handle server response
+            let properties = JSON.parse(x.body).entities[title].claims;
+            // TODO: deducir a partir de properties que se trata de una obra de arte
+            return true;
+        }).catch((err) => {
+            // handle request failure
+            return response.send("Malformed JSON body.");
+        });
     }
     
     // Esta función es la que debe seleccionar uno de los resultados de la búsqueda
