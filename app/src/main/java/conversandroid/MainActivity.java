@@ -21,13 +21,10 @@
 package conversandroid;
 
 /**
- * Example activity with speech input and output that implements the
- * speech management methods in VoiceActivity.
- * When the button is pressed, the user is asked to say something and
- * the system synthesizes it back.
+ * Highly intelligent museum guide prototype
  *
- * @author Zoraida Callejas, Michael McTear, David Griol
- * @version 3.1, 09/10/17
+ * @author @mx-psi, @fjmpq & @jojelupipa
+ * @version 0.1, 10/14/18
  */
 
 import android.content.Context;
@@ -83,7 +80,7 @@ public class MainActivity extends VoiceActivity {
             public void onClick(View v) {
                 //Ask the user to speak
                 try {
-                    speak(getResources().getString(R.string.initial_prompt), "EN", ID_PROMPT_QUERY);
+                    speak(getResources().getString(R.string.initial_prompt), "ES", ID_PROMPT_QUERY);
                 } catch (Exception e) {
                     Log.e(LOGTAG, "TTS not accessible");
                 }
@@ -123,7 +120,7 @@ public class MainActivity extends VoiceActivity {
 					* Number of results = 1 (we will use the best result to perform the search)
 					*/
                 startListeningTime = System.currentTimeMillis();
-                listen(Locale.ENGLISH, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM, 1); //Start listening
+                listen(new Locale("ES"), RecognizerIntent.LANGUAGE_MODEL_FREE_FORM, 1); //Start listening
             } catch (Exception e) {
                 this.runOnUiThread(new Runnable() {  //Toasts must be in the main thread
                     public void run() {
@@ -134,7 +131,7 @@ public class MainActivity extends VoiceActivity {
 
                 Log.e(LOGTAG, "ASR could not be started");
                 try {
-                    speak(getResources().getString(R.string.asr_notstarted), "EN", ID_PROMPT_INFO);
+                    speak(getResources().getString(R.string.asr_notstarted), "ES", ID_PROMPT_INFO);
                 } catch (Exception ex) {
                     Log.e(LOGTAG, "TTS not accessible");
                 }
@@ -245,7 +242,7 @@ public class MainActivity extends VoiceActivity {
 
             Log.e(LOGTAG, "Error when attempting to listen: " + msg);
             try {
-                speak(msg, "EN", ID_PROMPT_INFO);
+                speak(msg, "ES", ID_PROMPT_INFO);
             } catch (Exception e) {
                 Log.e(LOGTAG, "TTS not accessible");
             }
@@ -265,7 +262,7 @@ public class MainActivity extends VoiceActivity {
             if(nBestList.size()>0){
                 String bestResult = nBestList.get(0); //We will use the best result
                 try {
-                    speak(bestResult, "EN", ID_PROMPT_INFO);
+                    speak(bestResult, "ES", ID_PROMPT_INFO);
                 } catch (Exception e) { Log.e(LOGTAG, "TTS not accessible"); }
 
                 changeButtonAppearanceToDefault();

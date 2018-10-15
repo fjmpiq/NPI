@@ -4,9 +4,9 @@
 
 
     <!-- Texts -->
-    <string name="speechbtn_default">Press to speak</string>
-    <string name="speechbtn_listening">Listening...</string>
-    <string name="initial_prompt">Say something and I will repeat it</string>
+    <string name="speechbtn_default">Pulsa para hablar</string>
+    <string name="speechbtn_listening">Escuchando...</string>
+    <string name="initial_prompt">¡Háblame! intentaré repetirte</string>
 
     <string name="check_internet_connection">Please check your Internet connection</string>
 
