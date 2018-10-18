@@ -1,9 +1,9 @@
 /*
  *  Copyright 2016 Zoraida Callejas, Michael McTear and David Griol
  *
- *  This file is part of the Conversandroid Toolkit, from the book:
+ *  This is AN UPDATE of the Conversandroid Toolkit, from the book:
  *  The Conversational Interface, Michael McTear, Zoraida Callejas and David Griol
- *  Springer 2016 <https://github.com/zoraidacallejas/ConversationalInterface/>
+ *  Springer 2016 <https://github.com/zoraidacallejas/>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,16 +21,16 @@
 package conversandroid;
 
 /**
- * Highly intelligent museum guide prototype
  *
- * @author @mx-psi, @fjmpq & @jojelupipa
- * @version 0.1, 10/14/18
+ * @author @mx_psi, @fjmpiq, @jojelupipa, Michael McTear, David Griol
+ * @version 4.0, 04/06/18
  */
 
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -43,16 +43,30 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Locale;
 
+//Check the dependencies necessary to make these imports in
+//the build.gradle file
+//See tutorial here: https://github.com/dialogflow/dialogflow-android-client
+import ai.api.android.AIConfiguration; //<< be careful to use ai.api.android.AI... and not ai.api.AI...
+import ai.api.AIDataService;
+import ai.api.AIServiceException;
+import ai.api.model.AIRequest;
+import ai.api.model.AIResponse;
+import ai.api.model.Result;
+
 import conversandroid.talkback.R;
 
 public class MainActivity extends VoiceActivity {
 
-    private static final String LOGTAG = "TALKBACK";
+    private static final String LOGTAG = "CLEEPY";
     private static final Integer ID_PROMPT_QUERY = 0;
     private static final Integer ID_PROMPT_INFO = 1;
 
     private long startListeningTime = 0; // To skip errors (see processAsrError method)
 
+    //Connection to DialogFlow
+    private AIDataService aiDataService=null;
+    private final String ACCESS_TOKEN = "c9d250a9a574465cacf77f7117c472f4 ";   //TODO: INSERT YOUR ACCESS TOKEN
+    // https://dialogflow.com/docs/reference/agent/#obtaining_access_tokens)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +79,14 @@ public class MainActivity extends VoiceActivity {
         initSpeechInputOutput(this);
 
         //Set up the speech button
-        setSpeakButton();
+
+
+        //Dialogflow configuration parameters
+        final AIConfiguration config = new AIConfiguration(ACCESS_TOKEN,
+                AIConfiguration.SupportedLanguages.English,
+                AIConfiguration.RecognitionEngine.System);
+
+        aiDataService = new AIDataService(config);
     }
 
     /**
@@ -114,13 +135,13 @@ public class MainActivity extends VoiceActivity {
         if (deviceConnectedToInternet()) {
             try {
 
-				/*Start listening, with the following default parameters:
-					* Language = English
-					* Recognition model = Free form,
-					* Number of results = 1 (we will use the best result to perform the search)
-					*/
+                /*Start listening, with the following default parameters:
+                 * Language = English
+                 * Recognition model = Free form,
+                 * Number of results = 1 (we will use the best result to perform the search)
+                 */
                 startListeningTime = System.currentTimeMillis();
-                listen(new Locale("ES"), RecognizerIntent.LANGUAGE_MODEL_FREE_FORM, 1); //Start listening
+                listen(Locale.ENGLISH, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM, 1); //Start listening
             } catch (Exception e) {
                 this.runOnUiThread(new Runnable() {  //Toasts must be in the main thread
                     public void run() {
@@ -146,7 +167,7 @@ public class MainActivity extends VoiceActivity {
                 }
             });
             try {
-                speak(getResources().getString(R.string.check_internet_connection), "EN", ID_PROMPT_INFO);
+                speak(getResources().getString(R.string.check_internet_connection), "ES", ID_PROMPT_INFO);
             } catch (Exception ex) {
                 Log.e(LOGTAG, "TTS not accessible");
             }
@@ -257,17 +278,79 @@ public class MainActivity extends VoiceActivity {
 
         if(nBestList!=null){
 
-            Log.d(LOGTAG, "ASR found " + nBestList.size() + " results");
+            Log.d(LOGTAG, "ASR best result: " + nBestList.get(0));
 
             if(nBestList.size()>0){
-                String bestResult = nBestList.get(0); //We will use the best result
-                try {
-                    speak(bestResult, "ES", ID_PROMPT_INFO);
-                } catch (Exception e) { Log.e(LOGTAG, "TTS not accessible"); }
-
                 changeButtonAppearanceToDefault();
+                sendMsgToChatBot(nBestList.get(0)); //Send the best recognition hypothesis to the chatbot
             }
         }
+    }
+
+    /**
+     * Connects to DialogFlow sending the user input in text form
+     * @param userInput recognized utterance
+     */
+    private void sendMsgToChatBot(String userInput) {
+
+        //final AIRequest aiRequest = new AIRequest();
+        //aiRequest.setQuery(userInput);
+
+        new AsyncTask<String,Void,AIResponse>() {
+
+            /**
+             * Connects to the DialogFlow service
+             * @param strings Contains the user request
+             * @return language understanding result from DialogFlow
+             */
+            @Override
+            protected AIResponse doInBackground(String... strings) {
+                final String request = strings[0];
+                Log.d(LOGTAG,"Request: "+strings[0]);
+                try {
+                    final AIRequest aiRequest = new AIRequest(request);
+                    final AIResponse response = aiDataService.request(aiRequest);
+                    Log.d(LOGTAG,"Request: "+aiRequest);
+                    Log.d(LOGTAG,"Response: "+response);
+
+
+                    return response;
+                } catch (AIServiceException e) {
+                    try {
+                        speak("Could not retrieve a response from DialogFlow", "ES", ID_PROMPT_INFO);
+                        Log.e(LOGTAG,"Problems retrieving a response");
+                    } catch (Exception ex) {
+                        Log.e(LOGTAG, "English not available for TTS, default language used instead");
+                    }
+                }
+                return null;
+            }
+
+            /**
+             * The semantic parsing is decomposed and the text corresponding to the chatbot
+             * response is synthesized
+             * @param response parsing corresponding to the output of DialogFlow
+             */
+            @Override
+            protected void onPostExecute(AIResponse response) {
+                if (response != null) {
+                    // process aiResponse here
+                    // Mmore info for a more detailed parsing on the response: https://github.com/dialogflow/dialogflow-android-client/blob/master/apiAISampleApp/src/main/java/ai/api/sample/AIDialogSampleActivity.java
+
+                    final Result result = response.getResult();
+                    Log.d(LOGTAG,"Result: "+result.getResolvedQuery());
+                    Log.d(LOGTAG,"Action: " + result.getAction());
+
+                    final String chatbotResponse = result.getFulfillment().getSpeech();
+                    try {
+                        speak(chatbotResponse, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is neccessary to include a special "last_exchange" intent in dialogflow and process it here
+                        //so that the last system answer is synthesized using ID_PROMPT_INFO.
+                    } catch (Exception e) { Log.e(LOGTAG, "TTS not accessible"); }
+
+                }
+            }
+        }.execute(userInput);
+
     }
 
     /**

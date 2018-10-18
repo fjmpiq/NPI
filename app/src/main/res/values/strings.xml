@@ -6,7 +6,9 @@
     <!-- Texts -->
     <string name="speechbtn_default">Pulsa para hablar</string>
     <string name="speechbtn_listening">Escuchando...</string>
-    <string name="initial_prompt">¡Háblame! intentaré repetirte</string>
+    <string name="initial_prompt">¡Bienvenido al museo! Intentaré responder a tus preguntas</string>
+
+    <string name="question_repeater_default">Escucha tu pregunta</string>
 
     <string name="check_internet_connection">Please check your Internet connection</string>
 
@@ -29,7 +31,7 @@
     <string name="asr_error_nomatch">No recognition result matched</string>
     <string name="asr_error_recognizerbusy">Recognition service busy</string>
     <string name="asr_error_server">Server sends error status</string>
-    <string name="asr_error_speechtimeout">No speech input detected</string>
+    <string name="asr_error_speechtimeout">No he escuchado nada, repite la pregunta tras pulsar el botón</string>
     <string name="asr_notstarted">Speech recognition could not be started</string>
 
     <!-- Colors -->
