@@ -7,7 +7,7 @@ En todas las sentencias `${any}` es la variable a buscar
 # Creador de `${any}`
 
 ```sql
-SELECT ?creatorLabel WHERE {
+SELECT ?itemLabel ?creatorLabel WHERE {
   SERVICE wikibase:mwapi {
       bd:serviceParam wikibase:api "EntitySearch" .
       bd:serviceParam wikibase:endpoint "www.wikidata.org" .
@@ -28,7 +28,7 @@ SELECT ?creatorLabel WHERE {
 # Obras de `${any}`
 
 ```sql
-SELECT ?worksLabel WHERE {
+SELECT ?itemLabel ?worksLabel WHERE {
   SERVICE wikibase:mwapi {
       bd:serviceParam wikibase:api "EntitySearch" .
       bd:serviceParam wikibase:endpoint "www.wikidata.org" .
@@ -47,7 +47,7 @@ SELECT ?worksLabel WHERE {
 # Dónde está $obra
 
 ```sql
-SELECT ?countryLabel ?locLabel WHERE {
+SELECT ?itemLabel ?countryLabel ?locLabel WHERE {
   SERVICE wikibase:mwapi {
       bd:serviceParam wikibase:api "EntitySearch" .
       bd:serviceParam wikibase:endpoint "www.wikidata.org" .
@@ -68,7 +68,7 @@ SELECT ?countryLabel ?locLabel WHERE {
 # Qué tamaño tiene $obra
 
 ```sql
-SELECT ?height ?width WHERE {
+SELECT ?itemLabel ?height ?width WHERE {
   SERVICE wikibase:mwapi {
       bd:serviceParam wikibase:api "EntitySearch" .
       bd:serviceParam wikibase:endpoint "www.wikidata.org" .
@@ -89,7 +89,7 @@ SELECT ?height ?width WHERE {
 # Cuándo se hizo $obra
 
 ```sql
-SELECT ?inception WHERE {
+SELECT ?itemLabel ?inception WHERE {
   SERVICE wikibase:mwapi {
       bd:serviceParam wikibase:api "EntitySearch" .
       bd:serviceParam wikibase:endpoint "www.wikidata.org" .
@@ -111,7 +111,7 @@ SELECT ?inception WHERE {
 # Género/movimiento de $obra
 
 ```sql
-SELECT ?movementLabel ?genreLabel WHERE {
+SELECT ?itemLabel ?movementLabel ?genreLabel WHERE {
   SERVICE wikibase:mwapi {
       bd:serviceParam wikibase:api "EntitySearch" .
       bd:serviceParam wikibase:endpoint "www.wikidata.org" .
@@ -136,7 +136,7 @@ Esto devuelve una lista de los eventos significativos pero no tengo muy claro c�
 Esto debería poder hacerse con [qualifiers](https://www.wikidata.org/wiki/Wikidata:SPARQL_tutorial#Qualifiers) pero no sé muy bien cómo funcionan
 
 ```sql
-SELECT ?eventLabel WHERE {
+SELECT ?itemLabel ?eventLabel WHERE {
   SERVICE wikibase:mwapi {
       bd:serviceParam wikibase:api "EntitySearch" .
       bd:serviceParam wikibase:endpoint "www.wikidata.org" .
