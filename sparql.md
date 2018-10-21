@@ -156,4 +156,25 @@ SELECT ?itemLabel ?eventLabel WHERE {
 
 # Obras relacionadas con
 
-Posible idea: obras del mismo autor/género/movimiento que la obra mencionada.
+Obras del mismo autor.
+
+```sql
+SELECT ?itemLabel ?creatorLabel ?workLabel WHERE {
+  SERVICE wikibase:mwapi {
+      bd:serviceParam wikibase:api "EntitySearch" .
+      bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+      bd:serviceParam mwapi:search "Mona Lisa" .
+      bd:serviceParam mwapi:language "es" .
+      bd:serviceParam wikibase:limit 10 .
+      ?item wikibase:apiOutputItem mwapi:item .
+      ?num wikibase:apiOrdinal true .
+  }
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "es" .
+   }
+  ?item (wdt:P279|wdt:P31) ?type.
+  VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
+  ?item wdt:P170 ?creator.
+  ?work wdt:P170 ?creator.
+} ORDER BY ASC(?num) LIMIT 10
+```
