@@ -50,13 +50,6 @@ import static android.os.Build.BRAND;
 import static android.os.Build.VERSION;
 import static android.os.Build.VERSION_CODES;
 
-/**
- * @author @mx_psi, @fjmpiq, @jojelupipa, Michael McTear, David Griol
- * @version 3.1, 09/10/17
- *
- * @see <a href="http://developer.android.com/reference/android/speech/tts/TextToSpeech.html">TextToSpeech reference</a>
- * @see <a href="http://developer.android.com/reference/android/speech/tts/UtteranceProgressListener.html">UtteranceProgressListerner reference</a>
- */
 
 
 public abstract class VoiceActivity extends Activity implements RecognitionListener, OnInitListener{

@@ -38,6 +38,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -65,8 +66,11 @@ public class MainActivity extends VoiceActivity {
 
     //Connection to DialogFlow
     private AIDataService aiDataService=null;
-    private final String ACCESS_TOKEN = "c9d250a9a574465cacf77f7117c472f4 ";   //TODO: INSERT YOUR ACCESS TOKEN
+    private final String ACCESS_TOKEN = "c9d250a9a574465cacf77f7117c472f4 ";
     // https://dialogflow.com/docs/reference/agent/#obtaining_access_tokens)
+
+    // Access to textView
+    private TextView queryResultTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,11 +83,14 @@ public class MainActivity extends VoiceActivity {
         initSpeechInputOutput(this);
 
         //Set up the speech button
+        setSpeakButton();
 
+        //Set up the text view
+        setTextView();
 
         //Dialogflow configuration parameters
         final AIConfiguration config = new AIConfiguration(ACCESS_TOKEN,
-                AIConfiguration.SupportedLanguages.English,
+                AIConfiguration.SupportedLanguages.Spanish,
                 AIConfiguration.RecognitionEngine.System);
 
         aiDataService = new AIDataService(config);
@@ -110,6 +117,16 @@ public class MainActivity extends VoiceActivity {
     }
 
     /**
+     * Initializes the text view that will show the answer of the query
+     */
+
+    private void setTextView() {
+        queryResultTextView = findViewById(R.id.queryResult);
+        queryResultTextView.setText("Aquí se mostrará el resultado de la consulta");
+
+    }
+
+    /**
      * Explain to the user why we need their permission to record audio on the device
      * See the checkASRPermission in the VoiceActivity class
      */
@@ -131,15 +148,8 @@ public class MainActivity extends VoiceActivity {
      * If there is any error, the <code>onAsrError</code> method is invoked.
      */
     private void startListening() {
-
         if (deviceConnectedToInternet()) {
             try {
-
-                /*Start listening, with the following default parameters:
-                 * Language = English
-                 * Recognition model = Free form,
-                 * Number of results = 1 (we will use the best result to perform the search)
-                 */
                 startListeningTime = System.currentTimeMillis();
                 listen(Locale.ENGLISH, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM, 1); //Start listening
             } catch (Exception e) {
@@ -213,9 +223,6 @@ public class MainActivity extends VoiceActivity {
 
         changeButtonAppearanceToDefault();
 
-        //Possible bug in Android SpeechRecognizer: NO_MATCH errors even before the the ASR
-        // has even tried to recognized. We have adopted the solution proposed in:
-        // http://stackoverflow.com/questions/31071650/speechrecognizer-throws-onerror-on-the-first-listening
         long duration = System.currentTimeMillis() - startListeningTime;
         if (duration < 500 && errorCode == SpeechRecognizer.ERROR_NO_MATCH) {
             Log.e(LOGTAG, "Doesn't seem like the system tried to listen at all. duration = " + duration + "ms. Going to ignore the error");
@@ -275,7 +282,6 @@ public class MainActivity extends VoiceActivity {
      */
     @Override
     public void processAsrResults(ArrayList<String> nBestList, float[] nBestConfidences) {
-
         if(nBestList!=null){
 
             Log.d(LOGTAG, "ASR best result: " + nBestList.get(0));
@@ -317,7 +323,7 @@ public class MainActivity extends VoiceActivity {
                     return response;
                 } catch (AIServiceException e) {
                     try {
-                        speak("Could not retrieve a response from DialogFlow", "ES", ID_PROMPT_INFO);
+                        speak("Error al conectarse con Daialog Flou", "ES", ID_PROMPT_INFO);
                         Log.e(LOGTAG,"Problems retrieving a response");
                     } catch (Exception ex) {
                         Log.e(LOGTAG, "English not available for TTS, default language used instead");
@@ -345,6 +351,8 @@ public class MainActivity extends VoiceActivity {
                     try {
                         speak(chatbotResponse, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is neccessary to include a special "last_exchange" intent in dialogflow and process it here
                         //so that the last system answer is synthesized using ID_PROMPT_INFO.
+
+                        queryResultTextView.setText(chatbotResponse); // The response will be displayed by text
                     } catch (Exception e) { Log.e(LOGTAG, "TTS not accessible"); }
 
                 }

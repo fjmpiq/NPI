@@ -7,11 +7,13 @@
 
     <Button
         android:id="@+id/speech_btn"
+        style="@android:style/Widget.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="29dp"
+        android:elevation="0dp"
         android:text="@string/speechbtn_default"
         android:textSize="20sp" />
 
@@ -21,6 +23,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="165dp" />
+        android:layout_marginTop="165dp"
+        android:textAlignment="center" />
 
 </RelativeLayout>
