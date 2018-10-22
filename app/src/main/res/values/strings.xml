@@ -10,7 +10,7 @@
 
     <string name="question_repeater_default">Escucha tu pregunta</string>
 
-    <string name="check_internet_connection">Please check your Internet connection</string>
+    <string name="check_internet_connection">Por favor, compruebe su conexión a internet</string>
 
     <string name="asr_permission">TalkBack must access the microphone in order to perform speech recognition</string>
     <string name="asr_permission_notgranted">Sorry, TalkBack cannot work without accessing the microphone</string>
@@ -25,13 +25,13 @@
     <string name="asr_parcialresult">Parcial results received</string>
     <string name="asr_error_audio"> Audio recording error</string>
     <string name="asr_error_client">Unknown client side error</string>
-    <string name="asr_error_permissions">Insufficient permissions</string>
+    <string name="asr_error_permissions">Por favor, necesito permiso para acceder al micrófono para escuchar tus preguntas.</string>
     <string name="asr_error_network">Network related error</string>
     <string name="asr_error_networktimeout">Network operation timed out</string>
     <string name="asr_error_nomatch">No recognition result matched</string>
     <string name="asr_error_recognizerbusy">Recognition service busy</string>
     <string name="asr_error_server">Server sends error status</string>
-    <string name="asr_error_speechtimeout">No he escuchado nada, repite la pregunta tras pulsar el botón</string>
+    <string name="asr_error_speechtimeout">No he escuchado correctamente. Por favor, repite la pregunta</string>
     <string name="asr_notstarted">Speech recognition could not be started</string>
 
     <!-- Colors -->
