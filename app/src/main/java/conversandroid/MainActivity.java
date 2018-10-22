@@ -72,6 +72,9 @@ public class MainActivity extends VoiceActivity {
     // Access to textView
     private TextView queryResultTextView;
 
+    // Control of the initial prompt
+    boolean initialPromptDone = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,21 +100,37 @@ public class MainActivity extends VoiceActivity {
     }
 
     /**
-     * Initializes the search button and its listener. When the button is pressed, a feedback is shown to the user
-     * and the recognition starts
+     * Casts the initial prompt, then asigns startListening method to the button
      */
     private void setSpeakButton() {
         // gain reference to speak button
         Button speak = findViewById(R.id.speech_btn);
+
         speak.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Ask the user to speak
-                try {
-                    speak(getResources().getString(R.string.initial_prompt), "ES", ID_PROMPT_QUERY);
-                } catch (Exception e) {
-                    Log.e(LOGTAG, "TTS not accessible");
+                if(!initialPromptDone) {
+                    try {
+                        speak(getResources().getString(R.string.initial_prompt), "ES", ID_PROMPT_QUERY);
+
+                    } catch (Exception e) {
+                        Log.e(LOGTAG, "TTS not accessible");
+                    }
+                    initialPromptDone = true;
+                    try {   // TODO: Buscar una solución mejor para que no se solape la escucha con
+                        // la reproducción del mensaje sin usar onTTSDone y que no entre en bucle
+                        Thread.sleep(5000);
+                    } catch (Exception e) {
+                        Log.e(LOGTAG, "Error inesperado en la espera");
+                    }
                 }
+
+
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        startListening();
+                    }
+                });
             }
         });
     }
@@ -397,13 +416,13 @@ public class MainActivity extends VoiceActivity {
 
     @Override
     public void onTTSDone(String uttId) {
-        if(uttId.equals(ID_PROMPT_QUERY.toString())) {
+        /*if(uttId.equals(ID_PROMPT_QUERY.toString())) {
             runOnUiThread(new Runnable() {
                 public void run() {
                     startListening();
                 }
             });
-        }
+        }*/
     }
 
     /**
