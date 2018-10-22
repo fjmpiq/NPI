@@ -164,7 +164,7 @@ SELECT ?itemLabel ?creatorLabel ?workLabel WHERE {
   SERVICE wikibase:mwapi {
       bd:serviceParam wikibase:api "EntitySearch" .
       bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-      bd:serviceParam mwapi:search "Mona Lisa" .
+      bd:serviceParam mwapi:search "Guernica" .
       bd:serviceParam mwapi:language "es" .
       bd:serviceParam wikibase:limit 10 .
       ?item wikibase:apiOutputItem mwapi:item .
@@ -177,5 +177,7 @@ SELECT ?itemLabel ?creatorLabel ?workLabel WHERE {
   VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
   ?item wdt:P170 ?creator.
   ?work wdt:P170 ?creator.
-} ORDER BY ASC(?num) LIMIT 10
+  ?work wdt:P31 ?typeOfWork.
+  VALUES ?typeOfWork {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
+} LIMIT 10
 ```
