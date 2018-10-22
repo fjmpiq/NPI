@@ -111,13 +111,14 @@ SELECT ?itemLabel ?inception WHERE {
 # Género/movimiento de $obra
 
 ```sql
-SELECT ?itemLabel ?movementLabel ?genreLabel WHERE {
+SELECT ?item ?itemLabel ?movementLabel ?genreLabel WHERE {
   SERVICE wikibase:mwapi {
       bd:serviceParam wikibase:api "EntitySearch" .
       bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-      bd:serviceParam mwapi:search "La balsa de medusa" .
+      bd:serviceParam mwapi:search "El Pensador" .
       bd:serviceParam mwapi:language "es" .
       ?item wikibase:apiOutputItem mwapi:item .
+      ?num wikibase:apiOrdinal true .
   }
   SERVICE wikibase:label {
     bd:serviceParam wikibase:language "es" .
@@ -127,7 +128,7 @@ SELECT ?itemLabel ?movementLabel ?genreLabel WHERE {
   OPTIONAL {
     ?item wdt:P135 ?movement;
           wdt:P136 ?genre.}
-} ORDER BY DESC(?movementLabel) LIMIT 10
+} ORDER BY ASC(?num) LIMIT 10
 ```
 
 # Historia de $obra/Hechos sobre obra
