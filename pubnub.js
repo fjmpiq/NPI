@@ -20,7 +20,8 @@ export default (request, response) => {
     intentMap.set('LocalizacionObra', localizacionObra);
     intentMap.set('MedidasObra', medidasObra);
     intentMap.set('GeneroObra', generoObra);
-    intentMap.set('ObraRelacionada', obraRelacionada);  
+    intentMap.set('ObraRelacionada', obraRelacionada);
+    intentMap.set('HechosSobreObra', hechosSobreObra);    
     
     // Función que gestiona el intent AutorDeObra
     function autorDeObra(){
@@ -46,7 +47,7 @@ export default (request, response) => {
 
         return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
             const results = json.results.bindings;
-            if (results.length == 0)
+            if (results.length === 0)
                 return "Vaya, no conozco esa obra. :-("
             else
                 return "El autor de " + results[0].itemLabel.value + " es " + results[0].creatorLabel.value + ", " + results[0].creatorDescription.value + ".";
@@ -252,7 +253,7 @@ export default (request, response) => {
         headers = { 'Accept': 'application/sparql-results+json' };
 
         return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
-            const results = json.results.bindings.filter(r => {console.log(r.itemLabel.value, r.workLabel.value, (r.itemLabel.value === r.workLabel.value), /Q[0-9]+/.test(r.workLabel.value), ((r.itemLabel.value !== r.workLabel.value) && (!/Q[0-9]+/.test(r.workLabel.value)))); return ((r.itemLabel.value !== r.workLabel.value) && (!/Q[0-9]+/.test(r.workLabel.value)))});
+            const results = json.results.bindings.filter(r => (r.itemLabel.value !== r.workLabel.value) && (!/Q[0-9]+/.test(r.workLabel.value)));
             if (results.length === 0)
                 return "Vaya, no conozco a ese artista. :-(";
             else if (results.length === 1)
@@ -264,5 +265,36 @@ export default (request, response) => {
         });
     }
     
-    return intentMap.get(intent)().then((resp) => {return response.send({"fulfillmentText":resp});}).catch(error);
-};
+    // Función que gestiona el intent HechosSobreObra
+    function hechosSobreObra(id){
+        const endpointUrl = 'https://query.wikidata.org/sparql',
+        sparqlQuery = `
+        SELECT ?itemLabel ?eventLabel ?date WHERE {
+            SERVICE wikibase:mwapi {
+                bd:serviceParam wikibase:api "EntitySearch" .
+                bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+                bd:serviceParam mwapi:search "${any}" .
+                bd:serviceParam mwapi:language "es" .
+                ?item wikibase:apiOutputItem mwapi:item .
+            }
+            SERVICE wikibase:label {
+                bd:serviceParam wikibase:language "es" .
+            }
+            ?item (wdt:P279|wdt:P31) ?type.
+            VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
+            ?item p:P793 ?eventOfItem .
+            ?eventOfItem ps:P793 ?event .
+            ?eventOfItem pq:P585 ?date .
+        } LIMIT 10`,
+        fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery ),
+        headers = { 'Accept': 'application/sparql-results+json' };
+        return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
+            const results = json.results.bindings;
+            if (results.length === 0)
+                return "Vaya, no conozco a ese artista. :-(";
+            else {
+                let events = results.map(e => "En " + e.date.value.substring(0,4) + " se produjo " + e.eventLabel.value + ".");
+                return "Conozco los siguientes eventos sobre " + results[0].itemLabel.value + ":\n" + events.join(" ");
+            }
+        });
+    }
