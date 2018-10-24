@@ -137,11 +137,11 @@ Esto devuelve una lista de los eventos significativos pero no tengo muy claro c�
 Esto debería poder hacerse con [qualifiers](https://www.wikidata.org/wiki/Wikidata:SPARQL_tutorial#Qualifiers) pero no sé muy bien cómo funcionan
 
 ```sql
-SELECT ?itemLabel ?eventLabel WHERE {
+SELECT ?itemLabel ?eventLabel ?date WHERE {
   SERVICE wikibase:mwapi {
       bd:serviceParam wikibase:api "EntitySearch" .
       bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-      bd:serviceParam mwapi:search "Mona Lisa" .
+      bd:serviceParam mwapi:search "El grito" .
       bd:serviceParam mwapi:language "es" .
       ?item wikibase:apiOutputItem mwapi:item .
   }
@@ -150,8 +150,9 @@ SELECT ?itemLabel ?eventLabel WHERE {
    }
   ?item (wdt:P279|wdt:P31) ?type.
   VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
-  ?item wdt:P793 ?event.
-  # ?event pq:P585 ?date.
+  ?item p:P793 ?eventOfItem .
+  ?eventOfItem ps:P793 ?event .
+  ?eventOfItem pq:P585 ?date .
 } LIMIT 10
 ```
 
