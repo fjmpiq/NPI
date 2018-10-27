@@ -40,6 +40,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+// Sensors
+import android.hardware.SensorManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -56,7 +61,7 @@ import ai.api.model.Result;
 
 import conversandroid.talkback.R;
 
-public class MainActivity extends VoiceActivity {
+public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     private static final String LOGTAG = "CLEEPY";
     private static final Integer ID_PROMPT_QUERY = 0;
@@ -75,12 +80,19 @@ public class MainActivity extends VoiceActivity {
     // Control of the initial prompt
     boolean initialPromptDone = false;
 
+    // Sensors
+    SensorManager sManager;
+    Sensor proximitySensor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //Set layout
         setContentView(R.layout.activity_main);
+
+        //Initialize sensors
+        setUpSensors();
 
         //Initialize the speech recognizer and synthesizer
         initSpeechInputOutput(this);
@@ -99,8 +111,10 @@ public class MainActivity extends VoiceActivity {
         aiDataService = new AIDataService(config);
     }
 
+
     /**
-     * Casts the initial prompt, then asigns startListening method to the button
+     *   Asigns startListening method to the button, if it's the first time it's pressed
+     *   it will display the prompt message
      */
     private void setSpeakButton() {
         // gain reference to speak button
@@ -141,7 +155,7 @@ public class MainActivity extends VoiceActivity {
 
     private void setTextView() {
         queryResultTextView = findViewById(R.id.queryResult);
-        queryResultTextView.setText("Aquí se mostrará el resultado de la consulta");
+        queryResultTextView.setText(R.string.initial_textView_message);
 
     }
 
@@ -444,4 +458,43 @@ public class MainActivity extends VoiceActivity {
     public void onTTSStart(String uttId) {
         Log.d(LOGTAG, "TTS starts speaking");
     }
+
+    // Implementation of sensor methods
+
+    /**
+     * @brief Sets up sensors and its manager
+     */
+    private void setUpSensors() {
+        sManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
+        proximitySensor = sManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+    }
+
+    /**
+     *
+     */
+
+    protected void onResume() {
+        super.onResume();
+        sManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    protected void onPause() {
+        super.onPause();
+        sManager.unregisterListener(this);
+    }
+
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
+
+    public void onSensorChanged(SensorEvent event) {
+        if(event.sensor.getType()==Sensor.TYPE_PROXIMITY) {
+            if(event.values[0]==0) {
+                stop();
+            }
+
+        }
+    }
+
+
+
 }

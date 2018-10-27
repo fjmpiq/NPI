@@ -17,7 +17,7 @@
     <string name="asr_notsupported">ASR not supported</string>
     <string name="asr_results">Results ready :D</string>
     <string name="asr_invalid_params">Invalid parameters for recognition</string>
-    <string name="asr_error">Speech recognition error</string>
+    <string name="asr_error">No he podido escuchar bien</string>
     <string name="asr_readyforspeech">Ready to hear you speak!</string>
     <string name="asr_beginningofspeech">You have started talking ;)</string>
     <string name="asr_buffer">Buffer received</string>
@@ -40,4 +40,5 @@
     <string name="title_activity_main">MainActivity</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="initial_textView_message">Aquí se mostrará el resultado de la consulta</string>
 </resources>
