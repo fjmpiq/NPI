@@ -182,3 +182,18 @@ SELECT ?itemLabel ?creatorLabel ?workLabel WHERE {
   VALUES ?typeOfWork {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
 } LIMIT 10
 ```
+
+# Obras aleatorias ????
+
+``` sql
+SELECT ?item ?itemLabel ?creatorLabel ?countryLabel ?locLabel ?inception WHERE {
+  ?item (wdt:P279|wdt:P31) ?type.
+  VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
+  ?item wdt:P170 ?creator.
+  ?item wdt:P17 ?country.
+  ?item wdt:P276 ?loc.
+  ?item wdt:P571 ?inception.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en"}
+} ORDER BY RAND()
+LIMIT 10
+```
