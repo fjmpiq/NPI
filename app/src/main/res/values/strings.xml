@@ -13,7 +13,7 @@
     <string name="check_internet_connection">Por favor, compruebe su conexión a internet</string>
 
     <string name="asr_permission">Necesito el micrófono para funcionar :(</string>
-    <string name="asr_permission_notgranted">Lo siento, la aplicación no puede funcionar sin el micrófono</string>
+    <string name="asr_permission_notgranted">Lo siento, la aplicación no puede funcionar sin el micrófono. Acepta para que pueda ayudarte.</string>
     <string name="asr_notsupported">ASR no es soportado :(</string>
     <string name="asr_results">Results ready :D</string>
     <string name="asr_invalid_params">Invalid parameters for recognition</string>
