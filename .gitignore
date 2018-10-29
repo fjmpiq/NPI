@@ -38,3 +38,4 @@ output.json
 obj/
 .externalNativeBuild
 app/build.gradle
+app/build.gradle
