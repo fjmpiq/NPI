@@ -84,6 +84,12 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     SensorManager sManager;
     Sensor proximitySensor;
 
+    ////////
+    private float mAccel; // acceleration apart from gravity
+    private float mAccelCurrent; // current acceleration including gravity
+    private float mAccelLast; // last acceleration including gravity
+    ////////
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +115,12 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                 AIConfiguration.RecognitionEngine.System);
 
         aiDataService = new AIDataService(config);
+
+        sManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        mAccel = 0.00f;
+        mAccelCurrent = SensorManager.GRAVITY_EARTH;
+        mAccelLast = SensorManager.GRAVITY_EARTH;
     }
 
 
@@ -476,6 +488,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     protected void onResume() {
         super.onResume();
         sManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     protected void onPause() {
@@ -487,11 +500,25 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     }
 
     public void onSensorChanged(SensorEvent event) {
+        float x = event.values[0];
+        float y = event.values[1];
+        float z = event.values[2];
+
+        if(event.sensor.getType()==Sensor.TYPE_ACCELEROMETER) {
+            mAccelLast = mAccelCurrent;
+            mAccelCurrent = (float) Math.sqrt((double) (x * x + y * y + z * z));
+            float delta = mAccelCurrent - mAccelLast;
+            mAccel = mAccel * 0.9f + delta; // perform low-cut filter
+            if (mAccel > 12) {
+                Toast toast = Toast.makeText(getApplicationContext(), "Device has shaken.", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        }
+
         if(event.sensor.getType()==Sensor.TYPE_PROXIMITY) {
             if(event.values[0]==0) {
                 stop();
             }
-
         }
     }
 
