@@ -214,7 +214,11 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
      */
     public void onRecordAudioPermissionDenied() {
         Toast.makeText(getApplicationContext(), R.string.asr_permission_notgranted, Toast.LENGTH_SHORT).show();
-        System.exit(0);
+        try {
+            speak(getResources().getString(R.string.asr_permission_notgranted), "ES", ID_PROMPT_INFO);
+        } catch (Exception e) {
+            Log.e(LOGTAG, "TTS not accessible");
+        }
     }
 
     /**
