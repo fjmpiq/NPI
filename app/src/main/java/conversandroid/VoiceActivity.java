@@ -40,6 +40,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -504,8 +505,10 @@ public abstract class VoiceActivity extends Activity implements RecognitionListe
      * Stops the synthesizer if it is speaking
      */
     public void stop(){
-        if(myTTS.isSpeaking())
+        if(myTTS.isSpeaking()) {
             myTTS.stop();
+            Toast.makeText(getApplicationContext(), "Se ha detenido la narración", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
