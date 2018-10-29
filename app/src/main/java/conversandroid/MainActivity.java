@@ -27,9 +27,11 @@ package conversandroid;
  */
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -45,6 +47,9 @@ import android.hardware.SensorManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+
+import org.andresoviedo.util.android.AssetUtils;
+import org.andresoviedo.util.android.ContentUtils;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -100,6 +105,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         //Set up the speech button
         setSpeakButton();
 
+        // Set up the 3D button
+        set3DButton();
+
         //Set up the text view
         setTextView();
 
@@ -148,6 +156,40 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
             }
         });
     }
+
+    private void loadModelFromAssets() {
+        AssetUtils.createChooserDialog(this, "Elige el modelo", null, "models", "(?i).*\\.(obj|stl|dae)",
+                (String file) -> {
+                    if (file != null) {
+                        ContentUtils.provideAssets(this);
+                        launchModelRendererActivity(Uri.parse("assets://" + getPackageName() + "/" + file));
+                    }
+                });
+    }
+
+
+    private void launchModelRendererActivity(Uri uri) {
+        Log.i("Menu", "Launching renderer for '" + uri + "'");
+        Intent intent = new Intent(getApplicationContext(), ModelActivity.class);
+        intent.putExtra("uri", uri.toString());
+        startActivity(intent);
+    }
+
+    /**
+     *   Asigns startListening method to the button
+     */
+    private void set3DButton() {
+        // gain reference to speak button
+        Button speak = findViewById(R.id.launch3d_btn);
+
+        speak.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadModelFromAssets();
+            }
+        });
+    }
+
 
     /**
      * Initializes the text view that will show the answer of the query

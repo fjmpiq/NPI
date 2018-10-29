@@ -26,4 +26,12 @@
         android:layout_marginTop="165dp"
         android:textAlignment="center" />
 
+    <Button
+        android:id="@+id/launch3d_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/speech_btn"
+        android:layout_alignBottom="@+id/queryResult"
+        android:text="@string/button" />
+
 </RelativeLayout>

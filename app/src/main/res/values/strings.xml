@@ -41,4 +41,5 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="initial_textView_message">Aquí se mostrará el resultado de la consulta</string>
+    <string name="button">Ver 3D</string>
 </resources>
