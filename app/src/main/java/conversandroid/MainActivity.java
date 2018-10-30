@@ -50,9 +50,14 @@ import android.hardware.SensorEventListener;
 
 import org.andresoviedo.util.android.AssetUtils;
 import org.andresoviedo.util.android.ContentUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Random;
 
 //Check the dependencies necessary to make these imports in
 //the build.gradle file
@@ -65,6 +70,8 @@ import ai.api.model.AIResponse;
 import ai.api.model.Result;
 
 import conversandroid.talkback.R;
+
+import static java.util.Random.*;
 
 public class MainActivity extends VoiceActivity implements SensorEventListener {
 
@@ -89,11 +96,13 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     SensorManager sManager;
     Sensor proximitySensor;
 
-    ////////
+    // Accelerations for shake detection
     private float mAccel; // acceleration apart from gravity
     private float mAccelCurrent; // current acceleration including gravity
     private float mAccelLast; // last acceleration including gravity
-    ////////
+
+    // JSON object with random artworks
+    private JSONArray artworks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,11 +133,46 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
         aiDataService = new AIDataService(config);
 
+        //Initialize shake detector
         sManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
         mAccel = 0.00f;
         mAccelCurrent = SensorManager.GRAVITY_EARTH;
         mAccelLast = SensorManager.GRAVITY_EARTH;
+
+        //Parse artworks object
+        InputStream is = getResources().openRawResource(R.raw.artworks);
+        Writer writer = new StringWriter();
+        char[] buffer = new char[1024];
+        try {
+            Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            int n;
+            while ((n = reader.read(buffer)) != -1) {
+                try {
+                    writer.write(buffer, 0, n);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        String artworksString = writer.toString();
+        try {
+            artworks = new JSONArray(artworksString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -556,7 +600,8 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
             float delta = mAccelCurrent - mAccelLast;
             mAccel = mAccel * 0.9f + delta; // perform low-cut filter
             if (mAccel > 12) {
-                Toast toast = Toast.makeText(getApplicationContext(), "Device has shaken.", Toast.LENGTH_LONG);
+                Toast toast = Toast.makeText(getApplicationContext(), "Has agitado el dispositivo. Esto muestra información sobre una obra al azar.", Toast.LENGTH_LONG);
+                randArtwork();
                 toast.show();
             }
         }
@@ -568,6 +613,47 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         }
     }
 
+    // Randomly selects and artwork and shows information about it
+    private void randArtwork(){
+        String artworkName = null;
+        String artworkCreator = null;
+        String artworkCountry = null;
+        String artworkLoc = null;
+        String artworkInception = null;
+        String msg;
 
+        int randIndex;
 
+        String illegalNameRegex = "Q[0-9]+";
+        do{
+            randIndex = new Random().nextInt(artworks.length());
+
+            try {
+                artworkName = artworks.getJSONObject(randIndex).getString("itemLabel");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } while (artworkName.matches(illegalNameRegex));
+
+        try {
+            artworkName = artworks.getJSONObject(randIndex).getString("itemLabel");
+            artworkCreator = artworks.getJSONObject(randIndex).getString("creatorLabel");
+            artworkCountry = artworks.getJSONObject(randIndex).getString("countryLabel");
+            artworkLoc = artworks.getJSONObject(randIndex).getString("locLabel");
+            artworkInception = artworks.getJSONObject(randIndex).getString("inception").split("-")[0];
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        msg = artworkName + " es una obra de " + artworkCreator + " que data del " + artworkInception + ". Se encuentra en " + artworkLoc + ", " + artworkCountry + ".";
+
+        try {
+            speak(msg, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is neccessary to include a special "last_exchange" intent in dialogflow and process it here
+            //so that the last system answer is synthesized using ID_PROMPT_INFO.
+
+            queryResultTextView.setText(msg); // The response will be displayed by text
+        } catch (Exception e) {
+            Log.e(LOGTAG, "TTS not accessible");
+        }
+    }
 }
