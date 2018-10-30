@@ -532,13 +532,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     @Override
     public void onTTSDone(String uttId) {
-        /*if(uttId.equals(ID_PROMPT_QUERY.toString())) {
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    startListening();
-                }
-            });
-        }*/
+        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     /**
@@ -655,5 +649,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         } catch (Exception e) {
             Log.e(LOGTAG, "TTS not accessible");
         }
+
+        sManager.unregisterListener(this, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
     }
 }
