@@ -34,12 +34,16 @@
     <string name="asr_error_speechtimeout">No he escuchado correctamente. Por favor, repite la pregunta</string>
     <string name="asr_notstarted">No se ha podido comenzar la grabación</string>
 
+    <!-- onShake messages -->
+    <string name="onShake_toast">Has agitado el dispositivo. Esto muestra información sobre una obra al azar.</string>
+    <string name="randArtWork_msg">%s es una obra de %s que data del %s. Se encuentra en %s, %s.</string>
+
     <!-- Colors -->
     <color name="speechbtn_default">#EEEEEE</color>
     <color name="speechbtn_listening">#99FFBB</color>
     <string name="title_activity_main">MainActivity</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="initial_textView_message">Aquí se mostrará el resultado de la consulta</string>
+    <string name="initial_textView_message">Aquí se mostrará el resultado de la consulta. Puedes hacerme una pregunta o agitar el dispositivo para que muestre una obra al azar.</string>
     <string name="button">Ver 3D</string>
 </resources>

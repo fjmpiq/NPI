@@ -52,7 +52,6 @@ import org.andresoviedo.util.android.AssetUtils;
 import org.andresoviedo.util.android.ContentUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -71,8 +70,6 @@ import ai.api.model.Result;
 
 import conversandroid.talkback.R;
 
-import static java.util.Random.*;
-
 public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     private static final String LOGTAG = "CLEEPY";
@@ -83,7 +80,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     //Connection to DialogFlow
     private AIDataService aiDataService=null;
-    private final String ACCESS_TOKEN = "c9d250a9a574465cacf77f7117c472f4 ";
     // https://dialogflow.com/docs/reference/agent/#obtaining_access_tokens)
 
     // Access to textView
@@ -95,6 +91,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     // Sensors
     SensorManager sManager;
     Sensor proximitySensor;
+    Sensor accelSensor;
 
     // Accelerations for shake detection
     private float mAccel; // acceleration apart from gravity
@@ -127,7 +124,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         setTextView();
 
         //Dialogflow configuration parameters
-        final AIConfiguration config = new AIConfiguration(ACCESS_TOKEN,
+        String ACCESS_TOKEN = "c9d250a9a574465cacf77f7117c472f4 ";
+        final AIConfiguration config;
+        config = new AIConfiguration(ACCESS_TOKEN,
                 AIConfiguration.SupportedLanguages.Spanish,
                 AIConfiguration.RecognitionEngine.System);
 
@@ -135,7 +134,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
         //Initialize shake detector
         sManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        sManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_NORMAL);
         mAccel = 0.00f;
         mAccelCurrent = SensorManager.GRAVITY_EARTH;
         mAccelLast = SensorManager.GRAVITY_EARTH;
@@ -154,8 +153,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                     e.printStackTrace();
                 }
             }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -184,33 +181,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         // gain reference to speak button
         Button speak = findViewById(R.id.speech_btn);
 
-        speak.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!initialPromptDone) {
-                    try {
-                        speak(getResources().getString(R.string.initial_prompt), "ES", ID_PROMPT_QUERY);
-
-                    } catch (Exception e) {
-                        Log.e(LOGTAG, "TTS not accessible");
-                    }
-                    initialPromptDone = true;
-                    try {   // TODO: Buscar una solución mejor para que no se solape la escucha con
-                        // la reproducción del mensaje sin usar onTTSDone y que no entre en bucle
-                        Thread.sleep(5000);
-                    } catch (Exception e) {
-                        Log.e(LOGTAG, "Error inesperado en la espera");
-                    }
-                }
-
-
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        startListening();
-                    }
-                });
-            }
-        });
+        speak.setOnClickListener(this::onClick);
     }
 
     private void loadModelFromAssets() {
@@ -238,12 +209,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         // gain reference to speak button
         Button speak = findViewById(R.id.launch3d_btn);
 
-        speak.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadModelFromAssets();
-            }
-        });
+        speak.setOnClickListener(v -> loadModelFromAssets());
     }
 
 
@@ -288,11 +254,10 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                 startListeningTime = System.currentTimeMillis();
                 listen(Locale.ENGLISH, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM, 1); //Start listening
             } catch (Exception e) {
-                this.runOnUiThread(new Runnable() {  //Toasts must be in the main thread
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), R.string.asr_notstarted, Toast.LENGTH_SHORT).show();
-                        changeButtonAppearanceToDefault();
-                    }
+                //Toasts must be in the main thread
+                this.runOnUiThread(() -> {
+                    Toast.makeText(getApplicationContext(), R.string.asr_notstarted, Toast.LENGTH_SHORT).show();
+                    changeButtonAppearanceToDefault();
                 });
 
                 Log.e(LOGTAG, "ASR could not be started");
@@ -305,11 +270,10 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
             }
         } else {
 
-            this.runOnUiThread(new Runnable() { //Toasts must be in the main thread
-                public void run() {
-                    Toast.makeText(getApplicationContext(), R.string.check_internet_connection, Toast.LENGTH_SHORT).show();
-                    changeButtonAppearanceToDefault();
-                }
+            //Toasts must be in the main thread
+            this.runOnUiThread(() -> {
+                Toast.makeText(getApplicationContext(), R.string.check_internet_connection, Toast.LENGTH_SHORT).show();
+                changeButtonAppearanceToDefault();
             });
             try {
                 speak(getResources().getString(R.string.check_internet_connection), "ES", ID_PROMPT_INFO);
@@ -397,11 +361,8 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                     break;
             }
             String msg = getResources().getString(errorMsg);
-            this.runOnUiThread(new Runnable() { //Toasts must be in the main thread
-                public void run() {
-                    Toast.makeText(getApplicationContext(), R.string.asr_error, Toast.LENGTH_LONG).show();
-                }
-            });
+            //Toasts must be in the main thread
+            this.runOnUiThread(() -> Toast.makeText(getApplicationContext(), R.string.asr_error, Toast.LENGTH_LONG).show());
 
             Log.e(LOGTAG, "Error when attempting to listen: " + msg);
             try {
@@ -428,71 +389,74 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         }
     }
 
+    private class MyAsyncTaskClass extends AsyncTask<String,Void,AIResponse>{
+        /**
+         * Connects to the DialogFlow service
+         * @param strings Contains the user request
+         * @return language understanding result from DialogFlow
+         */
+        @Override
+        protected AIResponse doInBackground(String... strings) {
+            final String request = strings[0];
+            Log.d(LOGTAG,"Request: "+strings[0]);
+            try {
+                final AIRequest aiRequest = new AIRequest(request);
+                final AIResponse response = aiDataService.request(aiRequest);
+                Log.d(LOGTAG,"Request: "+aiRequest);
+                Log.d(LOGTAG,"Response: "+response);
+
+
+                return response;
+            } catch (AIServiceException e) {
+                try {
+                    speak("Error al conectarse con Daialog Flou", "ES", ID_PROMPT_INFO);
+                    Log.e(LOGTAG,"Problems retrieving a response");
+                } catch (Exception ex) {
+                    Log.e(LOGTAG, "English not available for TTS, default language used instead");
+                }
+            }
+            return null;
+        }
+
+        /**
+         * The semantic parsing is decomposed and the text corresponding to the chatbot
+         * response is synthesized
+         * @param response parsing corresponding to the output of DialogFlow
+         */
+        @Override
+        protected void onPostExecute(AIResponse response) {
+            if (response != null) {
+                // process aiResponse here
+                // Mmore info for a more detailed parsing on the response: https://github.com/dialogflow/dialogflow-android-client/blob/master/apiAISampleApp/src/main/java/ai/api/sample/AIDialogSampleActivity.java
+
+                final Result result = response.getResult();
+                Log.d(LOGTAG,"Result: "+result.getResolvedQuery());
+                Log.d(LOGTAG,"Action: " + result.getAction());
+
+                final String chatbotResponse = result.getFulfillment().getSpeech();
+                try {
+                    speak(chatbotResponse, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is neccessary to include a special "last_exchange" intent in dialogflow and process it here
+                    //so that the last system answer is synthesized using ID_PROMPT_INFO.
+
+                    queryResultTextView.setText(chatbotResponse); // The response will be displayed by text
+                } catch (Exception e) { Log.e(LOGTAG, "TTS not accessible"); }
+
+            }
+        }
+    };
+
     /**
      * Connects to DialogFlow sending the user input in text form
      * @param userInput recognized utterance
      */
+
     private void sendMsgToChatBot(String userInput) {
 
         //final AIRequest aiRequest = new AIRequest();
         //aiRequest.setQuery(userInput);
 
-        new AsyncTask<String,Void,AIResponse>() {
-
-            /**
-             * Connects to the DialogFlow service
-             * @param strings Contains the user request
-             * @return language understanding result from DialogFlow
-             */
-            @Override
-            protected AIResponse doInBackground(String... strings) {
-                final String request = strings[0];
-                Log.d(LOGTAG,"Request: "+strings[0]);
-                try {
-                    final AIRequest aiRequest = new AIRequest(request);
-                    final AIResponse response = aiDataService.request(aiRequest);
-                    Log.d(LOGTAG,"Request: "+aiRequest);
-                    Log.d(LOGTAG,"Response: "+response);
-
-
-                    return response;
-                } catch (AIServiceException e) {
-                    try {
-                        speak("Error al conectarse con Daialog Flou", "ES", ID_PROMPT_INFO);
-                        Log.e(LOGTAG,"Problems retrieving a response");
-                    } catch (Exception ex) {
-                        Log.e(LOGTAG, "English not available for TTS, default language used instead");
-                    }
-                }
-                return null;
-            }
-
-            /**
-             * The semantic parsing is decomposed and the text corresponding to the chatbot
-             * response is synthesized
-             * @param response parsing corresponding to the output of DialogFlow
-             */
-            @Override
-            protected void onPostExecute(AIResponse response) {
-                if (response != null) {
-                    // process aiResponse here
-                    // Mmore info for a more detailed parsing on the response: https://github.com/dialogflow/dialogflow-android-client/blob/master/apiAISampleApp/src/main/java/ai/api/sample/AIDialogSampleActivity.java
-
-                    final Result result = response.getResult();
-                    Log.d(LOGTAG,"Result: "+result.getResolvedQuery());
-                    Log.d(LOGTAG,"Action: " + result.getAction());
-
-                    final String chatbotResponse = result.getFulfillment().getSpeech();
-                    try {
-                        speak(chatbotResponse, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is neccessary to include a special "last_exchange" intent in dialogflow and process it here
-                        //so that the last system answer is synthesized using ID_PROMPT_INFO.
-
-                        queryResultTextView.setText(chatbotResponse); // The response will be displayed by text
-                    } catch (Exception e) { Log.e(LOGTAG, "TTS not accessible"); }
-
-                }
-            }
-        }.execute(userInput);
+        AsyncTask<String,Void,AIResponse> myAsyncTask = new MyAsyncTaskClass();
+        myAsyncTask.execute(userInput);
 
     }
 
@@ -502,7 +466,8 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
      */
     public boolean deviceConnectedToInternet() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        NetworkInfo activeNetwork;
+        activeNetwork = cm.getActiveNetworkInfo();
         return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
     }
 
@@ -532,7 +497,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     @Override
     public void onTTSDone(String uttId) {
-        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        sManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     /**
@@ -563,6 +528,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     private void setUpSensors() {
         sManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
         proximitySensor = sManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        accelSensor = sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
     /**
@@ -572,7 +538,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     protected void onResume() {
         super.onResume();
         sManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
-        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        sManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     protected void onPause() {
@@ -594,9 +560,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
             float delta = mAccelCurrent - mAccelLast;
             mAccel = mAccel * 0.9f + delta; // perform low-cut filter
             if (mAccel > 12) {
-                Toast toast = Toast.makeText(getApplicationContext(), "Has agitado el dispositivo. Esto muestra información sobre una obra al azar.", Toast.LENGTH_LONG);
-                randArtwork();
-                toast.show();
+                onShake();
             }
         }
 
@@ -607,8 +571,24 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         }
     }
 
+    // Called when device is shaken
+    private void onShake(){
+        Toast toast = Toast.makeText(getApplicationContext(), R.string.onShake_toast, Toast.LENGTH_LONG);
+        toast.show();
+        String msg = randArtwork();
+        sManager.unregisterListener(this, accelSensor);
+        
+        try {
+            speak(msg, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is neccessary to include a special "last_exchange" intent in dialogflow and process it here
+            //so that the last system answer is synthesized using ID_PROMPT_INFO.
+            queryResultTextView.setText(msg); // The response will be displayed by text
+        } catch (Exception e) {
+            Log.e(LOGTAG, "TTS not accessible");
+        }
+    }
+
     // Randomly selects and artwork and shows information about it
-    private void randArtwork(){
+    private String randArtwork(){
         String artworkName = null;
         String artworkCreator = null;
         String artworkCountry = null;
@@ -638,18 +618,29 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        
+        msg = String.format("%s es una obra de %s que data del %s. Se encuentra en %s, %s.", artworkName, artworkCreator, artworkInception, artworkLoc, artworkCountry);
+        return msg;
+    }
 
-        msg = artworkName + " es una obra de " + artworkCreator + " que data del " + artworkInception + ". Se encuentra en " + artworkLoc + ", " + artworkCountry + ".";
+    private void onClick(View v) {
+        if (!initialPromptDone) {
+            try {
+                speak(getResources().getString(R.string.initial_prompt), "ES", ID_PROMPT_QUERY);
 
-        try {
-            speak(msg, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is neccessary to include a special "last_exchange" intent in dialogflow and process it here
-            //so that the last system answer is synthesized using ID_PROMPT_INFO.
-
-            queryResultTextView.setText(msg); // The response will be displayed by text
-        } catch (Exception e) {
-            Log.e(LOGTAG, "TTS not accessible");
+            } catch (Exception e) {
+                Log.e(LOGTAG, "TTS not accessible");
+            }
+            initialPromptDone = true;
+            try {   // TODO: Buscar una solución mejor para que no se solape la escucha con
+                // la reproducción del mensaje sin usar onTTSDone y que no entre en bucle
+                Thread.sleep(5000);
+            } catch (Exception e) {
+                Log.e(LOGTAG, "Error inesperado en la espera");
+            }
         }
 
-        sManager.unregisterListener(this, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
+
+        runOnUiThread(this::startListening);
     }
 }
