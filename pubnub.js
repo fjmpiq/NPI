@@ -11,6 +11,9 @@ export default (request, response) => {
     let intent = JSON.parse(request.body).queryResult.intent.displayName;
     let error = (err) => {return response.send({"fulfillmentText":"Uh oh, ha habido un error!"});};
     
+    let tries = 1;
+    let maxTries = 2;
+    
     // Mapa de las funciones que gestionan cada intent
     let intentMap = new Map();
     intentMap.set('ObraRelacionada', obraRelacionada);
@@ -20,8 +23,35 @@ export default (request, response) => {
     intentMap.set('LocalizacionObra', localizacionObra);
     intentMap.set('MedidasObra', medidasObra);
     intentMap.set('GeneroObra', generoObra);
-    intentMap.set('ObraRelacionada', obraRelacionada);
-    intentMap.set('HechosSobreObra', hechosSobreObra);    
+    intentMap.set('HechosSobreObra', hechosSobreObra);
+    
+    // Mapa de las respuestas que da cuando falla en la consulta
+    let failed = new Map();
+    failed.set('ObraRelacionada', "Lo siento, no conozco obras relacionadas...");
+    failed.set('AutorDeObra', "Lo siento, no conozco el autor de esa obra...");
+    failed.set('FechaObra', "Lo siento, no conozco la fecha de creación de esa obra...");  
+    failed.set('ObrasDeAutor', "Lo siento, no conozco obras de ese autor...");
+    failed.set('LocalizacionObra', "Lo siento, no conozco la localización de esa obra...");
+    failed.set('MedidasObra', "Lo siento, no conozco las medidas de esa obra...");
+    failed.set('GeneroObra', "Lo siento, no conozco el género de esa obra...");
+    failed.set('HechosSobreObra', "Lo siento, no conozco nada interesante sobre esa obra...");
+    
+    function tryAgain(){
+        tries += 1;
+        if (tries > maxTries){
+            return failed.get(intent);
+        }
+        else{
+            tryAlternativeTerm();
+            return intentMap.get(intent)();
+        }
+    }
+    
+    function tryAlternativeTerm(){
+        if ((any.substring(0,3) === "el ") || (any.substring(0,3) === "la ")){
+            any = any.substring(3);
+        }
+    }
     
     // Función que gestiona el intent AutorDeObra
     function autorDeObra(){
@@ -42,13 +72,13 @@ export default (request, response) => {
             VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
             ?item wdt:P170 ?creator.
         } LIMIT 10`,
-      fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery ),
-      headers = { 'Accept': 'application/sparql-results+json' };
-
+        fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery ),
+        headers = { 'Accept': 'application/sparql-results+json' };
+        
         return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
             const results = json.results.bindings;
             if (results.length === 0)
-                return "Vaya, no conozco esa obra. :-("
+                return tryAgain();
             else
                 return "El autor de " + results[0].itemLabel.value + " es " + results[0].creatorLabel.value + ", " + results[0].creatorDescription.value + ".";
         });
@@ -80,7 +110,7 @@ export default (request, response) => {
         return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
             const results = json.results.bindings;
             if (results.length === 0)
-                return "Vaya, no conozco esa obra. :-(";
+                return tryAgain();
             else
                 return results[0].itemLabel.value + " data de " + results[0].inception.value.substring(0,4) + ".";
         });
@@ -110,7 +140,7 @@ export default (request, response) => {
         return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
             const results = json.results.bindings;
             if (results.length === 0)
-                return "Vaya, no conozco a ese artista. :-(";
+                return tryAgain();
             else if (results.length === 1)
                 return "La obra más conocida de " + results[0].itemLabel.value + " es " + results[0].worksLabel.value;
             else if (results.length === 2)
@@ -146,7 +176,7 @@ export default (request, response) => {
         return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
             const results = json.results.bindings;
             if (results.length === 0)
-                return "Vaya, no esa obra. :-(";
+                return tryAgain();
             else
                 return results[0].itemLabel.value + " se encuentra en " + results[0].locLabel.value + " (" + results[0].countryLabel.value + ").";
         });
@@ -178,7 +208,7 @@ export default (request, response) => {
         return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
             const results = json.results.bindings;
             if (results.length === 0)
-                return "Vaya, no conozco esa obra. :-(";
+                return tryAgain();
             else
                 return results[0].itemLabel.value + " mide " + results[0].height.value + " centímetros de alto y " + results[0].width.value + " centímetros de ancho.";
         });
@@ -212,7 +242,7 @@ export default (request, response) => {
         return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
             const results = json.results.bindings;
             if (results.length === 0)
-                return "Vaya, no conozco esa obra. :-(";
+                return tryAgain();
             else
                 if (results[0].hasOwnProperty("movementLabel"))
                     if (results[0].hasOwnProperty("genreLabel"))
@@ -255,7 +285,7 @@ export default (request, response) => {
         return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
             const results = json.results.bindings.filter(r => (r.itemLabel.value !== r.workLabel.value) && (!/Q[0-9]+/.test(r.workLabel.value)));
             if (results.length === 0)
-                return "Vaya, no conozco a ese artista. :-(";
+                return tryAgain();
             else if (results.length === 1)
                 return "Una obra relacionada con " + results[0].itemLabel.value + " es " + results[0].workLabel.value + ".";
             else if (results.length === 2)
@@ -291,10 +321,13 @@ export default (request, response) => {
         return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
             const results = json.results.bindings;
             if (results.length === 0)
-                return "Vaya, no conozco a ese artista. :-(";
+                return tryAgain();
             else {
                 let events = results.map(e => "En " + e.date.value.substring(0,4) + " se produjo " + e.eventLabel.value + ".");
                 return "Conozco los siguientes eventos sobre " + results[0].itemLabel.value + ":\n" + events.join(" ");
             }
         });
     }
+    
+    return intentMap.get(intent)().then((resp) => {return response.send({"fulfillmentText":resp});}).catch(error);
+};
