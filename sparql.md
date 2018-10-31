@@ -193,7 +193,7 @@ SELECT ?item ?itemLabel ?creatorLabel ?countryLabel ?locLabel ?inception WHERE {
   ?item wdt:P17 ?country.
   ?item wdt:P276 ?loc.
   ?item wdt:P571 ?inception.
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en"}
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "es"}
 } ORDER BY RAND()
-LIMIT 10
+LIMIT 1000
 ```
