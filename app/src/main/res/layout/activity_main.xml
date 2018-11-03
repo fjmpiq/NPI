@@ -34,4 +34,12 @@
         android:layout_alignBottom="@+id/queryResult"
         android:text="@string/button" />
 
+    <Button
+        android:id="@+id/qr_scanner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/queryResult"
+        android:layout_alignStart="@+id/speech_btn"
+        android:text="@string/qr_button_text" />
+
 </RelativeLayout>

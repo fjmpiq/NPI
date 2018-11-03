@@ -47,6 +47,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import conversandroid.talkback.R;
+
 import static android.os.Build.BRAND;
 import static android.os.Build.VERSION;
 import static android.os.Build.VERSION_CODES;
@@ -509,6 +511,13 @@ public abstract class VoiceActivity extends Activity implements RecognitionListe
             myTTS.stop();
             Toast.makeText(getApplicationContext(), "Se ha detenido la narración", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * Returns if the TTS is speaking or not
+     */
+    public boolean isTTSSpeaking() {
+        return myTTS.isSpeaking();
     }
 
     /**
