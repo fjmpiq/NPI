@@ -28,9 +28,9 @@ export default (request, response) => {
     // Mapa de las respuestas que da cuando falla en la consulta
     let failed = new Map();
     failed.set('ObraRelacionada', "Lo siento, no conozco obras relacionadas...");
-    failed.set('AutorDeObra', "Lo siento, no conozco el autor de esa obra...");
+    failed.set('AutorDeObra', "Lo siento, no conozco el autor o autora de esa obra...");
     failed.set('FechaObra', "Lo siento, no conozco la fecha de creación de esa obra...");  
-    failed.set('ObrasDeAutor', "Lo siento, no conozco obras de ese autor...");
+    failed.set('ObrasDeAutor', "Lo siento, no conozco obras de ese autor o autora...");
     failed.set('LocalizacionObra', "Lo siento, no conozco la localización de esa obra...");
     failed.set('MedidasObra', "Lo siento, no conozco las medidas de esa obra...");
     failed.set('GeneroObra', "Lo siento, no conozco el género de esa obra...");
@@ -53,11 +53,19 @@ export default (request, response) => {
         }
     }
     
+    function autorAutora(gender){
+        switch (gender){
+            case "masculino": return "El autor";
+            case "femenino": return "La autora";
+            default: return "El autor o autora";
+        }
+    }
+    
     // Función que gestiona el intent AutorDeObra
     function autorDeObra(){
         const endpointUrl = 'https://query.wikidata.org/sparql',
         sparqlQuery = `
-        SELECT ?itemLabel ?creatorLabel ?creatorDescription WHERE {
+        SELECT ?itemLabel ?creatorLabel ?creatorDescription ?genderLabel WHERE {
             SERVICE wikibase:mwapi {
                 bd:serviceParam wikibase:api "EntitySearch" .
                 bd:serviceParam wikibase:endpoint "www.wikidata.org" .
@@ -71,6 +79,7 @@ export default (request, response) => {
             ?item (wdt:P279|wdt:P31) ?type.
             VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
             ?item wdt:P170 ?creator.
+            ?creator wdt:P21 ?gender.
         } LIMIT 10`,
         fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery ),
         headers = { 'Accept': 'application/sparql-results+json' };
@@ -80,7 +89,7 @@ export default (request, response) => {
             if (results.length === 0)
                 return tryAgain();
             else
-                return "El autor de " + results[0].itemLabel.value + " es " + results[0].creatorLabel.value + ", " + results[0].creatorDescription.value + ".";
+                return autorAutora(results[0].genderLabel.value) + " de " + results[0].itemLabel.value + " es " + results[0].creatorLabel.value + ", " + results[0].creatorDescription.value + ".";
         });
     }
     
