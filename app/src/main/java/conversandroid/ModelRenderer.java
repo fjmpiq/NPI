@@ -17,6 +17,7 @@ import conversandroid.demo.SceneLoader;
 import org.andresoviedo.util.android.GLUtil;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,6 +155,12 @@ public class ModelRenderer implements GLSurfaceView.Renderer {
 			// Log.d("Camera", "Changed! :"+camera.ToStringVector());
 			Matrix.multiplyMM(mvpMatrix, 0, modelProjectionMatrix, 0, modelViewMatrix, 0);
 			camera.setChanged(false);
+		}
+		if(camera.hasChangedRotMatrix()){
+            Matrix.setLookAtM(modelViewMatrix, 0, camera.xPos, camera.yPos, camera.zPos, camera.xView, camera.yView, camera.zView, camera.xUp, camera.yUp, camera.zUp);
+            Matrix.multiplyMM(modelViewMatrix, 0, modelViewMatrix, 0, camera.getRotationMatrix(), 0);
+            Matrix.multiplyMM(mvpMatrix, 0, modelProjectionMatrix, 0, modelViewMatrix, 0);
+            camera.setChangedRotMatrix(false);
 		}
 
 		// draw light

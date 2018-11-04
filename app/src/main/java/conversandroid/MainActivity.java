@@ -55,7 +55,9 @@ import org.json.JSONException;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 
 //Check the dependencies necessary to make these imports in
@@ -100,6 +102,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     // JSON object with random artworks
     private JSONArray artworks;
+
+    // Parameters for 3D models
+    private Map<String, Object> loadModelParameters = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,6 +204,13 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         Log.i("Menu", "Launching renderer for '" + uri + "'");
         Intent intent = new Intent(getApplicationContext(), ModelActivity.class);
         intent.putExtra("uri", uri.toString());
+
+        // content provider case
+        if (!loadModelParameters.isEmpty()) {
+            intent.putExtra("type", loadModelParameters.get("type").toString());
+            loadModelParameters.clear();
+        }
+
         startActivity(intent);
     }
 

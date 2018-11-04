@@ -2,6 +2,7 @@ package conversandroid;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.hardware.Sensor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,7 @@ import conversandroid.demo.SceneLoader;
 import org.andresoviedo.util.android.ContentUtils;
 
 import java.io.IOException;
+import android.hardware.SensorManager;
 
 /**
  * This activity represents the container for our 3D viewer.
@@ -40,6 +42,8 @@ public class ModelActivity extends Activity {
     private ModelSurfaceView gLView;
 
     private SceneLoader scene;
+
+    private SensorManager sensorManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +76,10 @@ public class ModelActivity extends Activity {
         }
         scene.init();
 
+
         // Create a GLSurfaceView instance and set it
         // as the ContentView for this Activity.
+        sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         gLView = new ModelSurfaceView(this);
         setContentView(gLView);
     }
@@ -120,6 +126,7 @@ public class ModelActivity extends Activity {
     public ModelSurfaceView getGLView() {
         return gLView;
     }
+    public SensorManager getSensorManager() {return sensorManager;}
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -143,4 +150,19 @@ public class ModelActivity extends Activity {
                 }
         }
     }
+
+    protected void onResume() {
+        // Ideally a game should implement onResume() and onPause()
+        // to take appropriate action when the activity looses focus
+        super.onResume();
+        gLView.start();
+    }
+
+    protected void onPause() {
+        // Ideally a game should implement onResume() and onPause()
+        // to take appropriate action when the activity looses focus
+        super.onPause();
+        gLView.stop();
+    }
+
 }

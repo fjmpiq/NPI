@@ -21,13 +21,6 @@ import android.util.Log;
 
 public class Camera {
 
-	public static final float UP = 0.5f; // Forward speed.
-	public static final float DOWN = -0.5f; // Backward speed.
-	public static final float LEFT = 0.5f; // Left speed.
-	public static final float RIGHT = -0.5f; // Right speed.
-	public static final float STRAFE_LEFT = -0.5f; // Left straft speed.
-	public static final float STRAFE_RIGHT = 0.5f; // Right straft speed.
-
 	public static final int AIM = 10;
 	public static final int CAMERA_MAX_ZOOM = 40;
 
@@ -38,7 +31,7 @@ public class Camera {
 
 	private final BoundingBox boundingBox = new BoundingBox("scene",-CAMERA_MAX_ZOOM,CAMERA_MAX_ZOOM,-CAMERA_MAX_ZOOM,CAMERA_MAX_ZOOM,-CAMERA_MAX_ZOOM,CAMERA_MAX_ZOOM);
 
-	float xStrafe = 0, yStrafe = 0, zStrafe = 0; // Strafe direction.
+    private float[] rotMatrix = new float[16];
 	float currentRotationAngle; // Keeps us from going too far up or down.
 
 	float[] matrix = new float[16];
@@ -46,8 +39,9 @@ public class Camera {
 	private long animationCounter;
 	private Object[] lastAction;
 	private boolean changed = false;
+    private boolean changedRot = false;
 
-	public Camera() {
+    public Camera() {
 		// Initialize variables...
 		this(0, 0, 6, 0, 0, -1, 0, 1, 0);
 
@@ -67,6 +61,10 @@ public class Camera {
 		this.xUp = xUp;
 		this.yUp = yUp;
 		this.zUp = zUp;
+        this.rotMatrix[ 0] = 1;
+        this.rotMatrix[ 4] = 1;
+        this.rotMatrix[ 8] = 1;
+        this.rotMatrix[12] = 1;
 	}
 
 	public synchronized void animate(){
@@ -76,14 +74,21 @@ public class Camera {
 			return;
 		}
 		String method = (String) lastAction[0];
-		if (method.equals("translate")){
-			float dX = (Float) lastAction[1];
-			float dY = (Float) lastAction[2];
-			translateCameraImpl(dX*animationCounter/100, dY*animationCounter/100);
-		} else if (method.equals("rotate")){
-			float rotZ = (Float)lastAction[1];
-			RotateImpl(rotZ/100*animationCounter);
-		}
+        switch (method) {
+            case "translate":
+                float dX = (Float) lastAction[1];
+                float dY = (Float) lastAction[2];
+                translateCameraImpl(dX * animationCounter / 100, dY * animationCounter / 100);
+                break;
+            case "rotate":
+                float rotZ = (Float) lastAction[1];
+                RotateImpl(rotZ / 100 * animationCounter);
+                break;
+            case "rotateM":
+                float[] rotMatrix = (float[]) lastAction[1];
+                RotateM(rotMatrix);
+                break;
+        }
 		animationCounter--;
 	}
 
@@ -141,7 +146,7 @@ public class Camera {
 		MoveCameraZImpl(direction);
 		lastAction = new Object[]{"zoom",direction};
 	}
-	public void MoveCameraZImpl(float direction) {
+	private void MoveCameraZImpl(float direction) {
 		// Moving the camera requires a little more then adding 1 to the z or
 		// subracting 1.
 		// First we need to get the direction at which we are looking.
@@ -288,7 +293,7 @@ public class Camera {
 		UpdateCamera(xSky, ySky, zSky, dX);
 	}
 
-	public void RotateCamera(float AngleDir, float xSpeed, float ySpeed, float zSpeed) {
+	private void RotateCamera(float AngleDir, float xSpeed, float ySpeed, float zSpeed) {
 		float xNewLookDirection = 0, yNewLookDirection = 0, zNewLookDirection = 0;
 		float xLookDirection = 0, yLookDirection = 0, zLookDirection = 0;
 		float CosineAngle = 0, SineAngle = 0;
@@ -424,7 +429,7 @@ public class Camera {
 		lastAction = new Object[]{"translate",dX, dY};
 	}
 
-	public void translateCameraImpl(float dX, float dY) {
+	private void translateCameraImpl(float dX, float dY) {
 		float vlen;
 
 		// Translating the camera requires a directional vector to rotate
@@ -611,6 +616,16 @@ public class Camera {
 		lastAction = new Object[]{"rotate",rotViewerZ};
 	}
 
+	public synchronized  void RotateM(float[] rotMatrix){
+	    setRotateMatrix(rotMatrix);
+	    lastAction = new Object[]{"rotateM", rotMatrix};
+    }
+
+	public void setRotateMatrix(float[] rotMatrix){
+	    this.rotMatrix = rotMatrix;
+        setChangedRotMatrix(true);
+    }
+
 	public void RotateImpl(float rotViewerZ) {
 		if (Float.isNaN(rotViewerZ)) {
 			Log.w("Rot", "NaN");
@@ -641,5 +656,15 @@ public class Camera {
 		setChanged(true);
 	}
 
+    public void setChangedRotMatrix(boolean v){
+	    this.changedRot = v;
+    }
 
+    public boolean hasChangedRotMatrix() {
+	    return this.changedRot;
+    }
+
+    public float[] getRotationMatrix() {
+	    return this.rotMatrix;
+    }
 }
