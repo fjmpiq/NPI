@@ -28,8 +28,8 @@
     <string name="asr_error_permissions">Por favor, necesito permiso para acceder al micrófono para escuchar tus preguntas.</string>
     <string name="asr_error_network">Network related error</string>
     <string name="asr_error_networktimeout">Network operation timed out</string>
-    <string name="asr_error_nomatch">No recognition result matched</string>
-    <string name="asr_error_recognizerbusy">Recognition service busy</string>
+    <string name="asr_error_nomatch">No he podido procesar correctamente la pregunta</string>
+    <string name="asr_error_recognizerbusy">Por favor no me satures. Déjame un momento que estoy procesando la petición</string>
     <string name="asr_error_server">Server sends error status</string>
     <string name="asr_error_speechtimeout">No he escuchado correctamente. Por favor, repite la pregunta</string>
     <string name="asr_notstarted">No se ha podido comenzar la grabación</string>
@@ -46,4 +46,5 @@
     <string name="hello_world">Hello world!</string>
     <string name="initial_textView_message">Aquí se mostrará el resultado de la consulta. Puedes hacerme una pregunta o agitar el dispositivo para que muestre una obra al azar.</string>
     <string name="button">Ver 3D</string>
+    <string name="qr_button_text">QR</string>
 </resources>

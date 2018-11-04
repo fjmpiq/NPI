@@ -26,8 +26,10 @@ package conversandroid;
  * @version 4.0, 04/06/18
  */
 
+import android.content.ActivityNotFoundException; // Launch intent
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager; // Launch intent
 import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -124,6 +126,8 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
         // Set up the 3D button
         set3DButton();
+
+        // Set up the QR button
 
         //Set up the text view
         setTextView();
@@ -222,6 +226,11 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         Button speak = findViewById(R.id.launch3d_btn);
 
         speak.setOnClickListener(v -> loadModelFromAssets());
+    }
+
+    private void setQRbutton() {
+        Button qr_button = findViewById(R.id.qr_scanner);
+
     }
 
 
@@ -636,6 +645,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     }
 
     private void onClick(View v) {
+
         if (!initialPromptDone) {
             try {
                 speak(getResources().getString(R.string.initial_prompt), "ES", ID_PROMPT_QUERY);
@@ -644,15 +654,10 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                 Log.e(LOGTAG, "TTS not accessible");
             }
             initialPromptDone = true;
-            try {   // TODO: Buscar una solución mejor para que no se solape la escucha con
-                // la reproducción del mensaje sin usar onTTSDone y que no entre en bucle
-                Thread.sleep(5000);
-            } catch (Exception e) {
-                Log.e(LOGTAG, "Error inesperado en la espera");
-            }
         }
 
-
-        runOnUiThread(this::startListening);
+        if(!isTTSSpeaking()) {
+            runOnUiThread(this::startListening);
+        }
     }
 }
