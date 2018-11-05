@@ -79,7 +79,7 @@ public class SceneLoader implements LoaderTask.Callback {
     /**
      * Animate model (dae only) or not
      */
-    private boolean animateModel = true;
+    private boolean animateModel = false;
     /**
      * Draw skeleton or not
      */

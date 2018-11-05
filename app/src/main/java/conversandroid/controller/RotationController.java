@@ -9,6 +9,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.opengl.Matrix;
+import android.util.Log;
 
 public class RotationController implements SensorEventListener{
 
@@ -17,7 +19,11 @@ public class RotationController implements SensorEventListener{
 	private final ModelSurfaceView view;
     private SensorManager mSensorManager;
     private Sensor mRotationVectorSensor;
-	private final float[] mRotationMatrix = new float[16];
+    private boolean initializedRot = false;
+
+    private final float[] initialRotMatrix = new float[16];
+    private final float[] initialTransRotMatrix   = new float[16];
+	private final float[] mRotationMatrix  = new float[16];
 
 	public RotationController(ModelSurfaceView view, ModelRenderer renderer, SensorManager sensorManager) {
 		super();
@@ -26,11 +32,6 @@ public class RotationController implements SensorEventListener{
         // find the rotation-vector sensor
         mRotationVectorSensor = mSensorManager.getDefaultSensor(
                 Sensor.TYPE_ROTATION_VECTOR);
-
-		mRotationMatrix[ 0] = 1;
-		mRotationMatrix[ 4] = 1;
-		mRotationMatrix[ 8] = 1;
-		mRotationMatrix[12] = 1;
 	}
 
     public void start() {
@@ -40,28 +41,32 @@ public class RotationController implements SensorEventListener{
         */
         mSensorManager.registerListener(this, mRotationVectorSensor, 10000);
     }
+
     public void stop() {
         // make sure to turn our sensor off when the activity is paused
         mSensorManager.unregisterListener(this);
+        initializedRot = false;
     }
     public void onSensorChanged(SensorEvent event) {
-        // we received a sensor event. it is a good practice to check
-        // that we received the proper event
         if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-            // convert the rotation-vector to a 4x4 matrix. the matrix
-            // is interpreted by Open GL as the inverse of the
-            // rotation-vector, which is what we want.
-            SensorManager.getRotationMatrixFromVector(
-                    mRotationMatrix , event.values);
-            SceneLoader scene = view.getModelActivity().getScene();
-            Camera camera = scene.getCamera();
-            camera.RotateM(mRotationMatrix);
-            view.requestRender();
+            if(!initializedRot){
+                SensorManager.getRotationMatrixFromVector(
+                        initialTransRotMatrix, event.values);
+                Matrix.transposeM(initialRotMatrix, 0, initialTransRotMatrix, 0);
+                initializedRot = true;
+            } else{
+                SensorManager.getRotationMatrixFromVector(
+                        mRotationMatrix , event.values);
+                Matrix.multiplyMM(mRotationMatrix, 0, initialRotMatrix, 0, mRotationMatrix, 0);
+                SceneLoader scene = view.getModelActivity().getScene();
+                Camera camera = scene.getCamera();
+                camera.RotateM(mRotationMatrix);
+                view.requestRender();
+            }
         }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
     }
 }

@@ -149,19 +149,19 @@ public class ModelRenderer implements GLSurfaceView.Renderer {
 
 		// recalculate mvp matrix according to where we are looking at now
 		Camera camera = scene.getCamera();
-		if (camera.hasChanged()) {
+		if(camera.hasChangedRotMatrix()){
+			Matrix.setLookAtM(modelViewMatrix, 0, camera.xPos, camera.yPos, camera.zPos, camera.xView, camera.yView, camera.zView, camera.xUp, camera.yUp, camera.zUp);
+			Matrix.multiplyMM(modelViewMatrix, 0, modelViewMatrix, 0, camera.getRotationMatrix(), 0);
+			Matrix.multiplyMM(mvpMatrix, 0, modelProjectionMatrix, 0, modelViewMatrix, 0);
+			camera.setChangedRotMatrix(false);
+		} else if (camera.hasChanged()) {
 			Matrix.setLookAtM(modelViewMatrix, 0, camera.xPos, camera.yPos, camera.zPos, camera.xView, camera.yView,
 					camera.zView, camera.xUp, camera.yUp, camera.zUp);
 			// Log.d("Camera", "Changed! :"+camera.ToStringVector());
 			Matrix.multiplyMM(mvpMatrix, 0, modelProjectionMatrix, 0, modelViewMatrix, 0);
 			camera.setChanged(false);
 		}
-		if(camera.hasChangedRotMatrix()){
-            Matrix.setLookAtM(modelViewMatrix, 0, camera.xPos, camera.yPos, camera.zPos, camera.xView, camera.yView, camera.zView, camera.xUp, camera.yUp, camera.zUp);
-            Matrix.multiplyMM(modelViewMatrix, 0, modelViewMatrix, 0, camera.getRotationMatrix(), 0);
-            Matrix.multiplyMM(mvpMatrix, 0, modelProjectionMatrix, 0, modelViewMatrix, 0);
-            camera.setChangedRotMatrix(false);
-		}
+
 
 		// draw light
 		if (scene.isDrawLighting()) {
@@ -174,7 +174,7 @@ public class ModelRenderer implements GLSurfaceView.Renderer {
 			Matrix.multiplyMV(lightPosInEyeSpace, 0, lightModelViewMatrix, 0, scene.getLightPosition(), 0);
 
 			// Draw a point that represents the light bulb
-			lightBulbDrawer.draw(scene.getLightBulb(), modelProjectionMatrix, modelViewMatrix, -1, lightPosInEyeSpace);
+			//lightBulbDrawer.draw(scene.getLightBulb(), modelProjectionMatrix, modelViewMatrix, -1, lightPosInEyeSpace);
 		}
 
 		List<Object3DData> objects = scene.getObjects();
@@ -251,7 +251,7 @@ public class ModelRenderer implements GLSurfaceView.Renderer {
 						boundingBoxes.put(objData, boundingBoxData);
 					}
 					Object3D boundingBoxDrawer = drawer.getBoundingBoxDrawer();
-					boundingBoxDrawer.draw(boundingBoxData, modelProjectionMatrix, modelViewMatrix, -1, null);
+					//boundingBoxDrawer.draw(boundingBoxData, modelProjectionMatrix, modelViewMatrix, -1, null);
 				}
 
 				// Draw normals
