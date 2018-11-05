@@ -457,9 +457,8 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                 try {
                     speak(chatbotResponse, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is neccessary to include a special "last_exchange" intent in dialogflow and process it here
                     //so that the last system answer is synthesized using ID_PROMPT_INFO.
-
-                    queryResultTextView.setText(chatbotResponse); // The response will be displayed by text
                 } catch (Exception e) { Log.e(LOGTAG, "TTS not accessible"); }
+                queryResultTextView.setText(chatbotResponse); // The response will be displayed by text
 
             }
         }
@@ -599,12 +598,12 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         sManager.unregisterListener(this, accelSensor);
         
         try {
-            speak(msg, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is neccessary to include a special "last_exchange" intent in dialogflow and process it here
+            speak(msg, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is necessary to include a special "last_exchange" intent in dialogflow and process it here
             //so that the last system answer is synthesized using ID_PROMPT_INFO.
-            queryResultTextView.setText(msg); // The response will be displayed by text
         } catch (Exception e) {
             Log.e(LOGTAG, "TTS not accessible");
         }
+        queryResultTextView.setText(msg); // The response will be displayed by text
     }
 
     // Randomly selects and artwork and shows information about it

@@ -88,7 +88,7 @@ public abstract class VoiceActivity extends Activity implements RecognitionListe
         // Find out whether speech recognition is supported
         List<ResolveInfo> intActivities = packManager.queryIntentActivities(
                 new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
-        if (intActivities.size() != 0 || "generic".equals(BRAND.toLowerCase(Locale.US))) {
+        if (true || intActivities.size() != 0 || "generic".equals(BRAND.toLowerCase(Locale.US))) {
             myASR = SpeechRecognizer.createSpeechRecognizer(ctx);
             myASR.setRecognitionListener(this);
         }
@@ -558,9 +558,19 @@ public abstract class VoiceActivity extends Activity implements RecognitionListe
         if(status != TextToSpeech.ERROR){
             setLocale();
         }
-        else
-        {
-            Log.e(LOGTAG, "Error creating the TTS");
+        else if(status == TextToSpeech.LANG_MISSING_DATA) {
+            PackageManager pm = getPackageManager();
+            Intent installIntent = new Intent();
+            installIntent.setAction(
+                    TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+            ResolveInfo resolveInfo = pm.resolveActivity( installIntent, PackageManager.MATCH_DEFAULT_ONLY );
+
+            if( resolveInfo == null ) {
+                Log.e(LOGTAG, "No puedo instalar TTS");
+            } else startActivity(installIntent);
+        }
+        else {
+            Log.e(LOGTAG, "Error creating the TTS: " + Integer.toString(status));
         }
 
     }
