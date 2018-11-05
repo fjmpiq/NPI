@@ -118,6 +118,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         //Initialize sensors
         setUpSensors();
 
+        //Set up the text view
+        setTextView();
+
         //Initialize the speech recognizer and synthesizer
         initSpeechInputOutput(this);
 
@@ -128,9 +131,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         set3DButton();
 
         // Set up the QR button
-
-        //Set up the text view
-        setTextView();
 
         //Dialogflow configuration parameters
         String ACCESS_TOKEN = "c9d250a9a574465cacf77f7117c472f4 ";
@@ -223,9 +223,8 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
      */
     private void set3DButton() {
         // gain reference to speak button
-        Button speak = findViewById(R.id.launch3d_btn);
-
-        speak.setOnClickListener(v -> loadModelFromAssets());
+        Button b3D = findViewById(R.id.launch3d_btn);
+        b3D.setOnClickListener(v -> loadModelFromAssets());
     }
 
     private void setQRbutton() {
@@ -281,11 +280,11 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                     changeButtonAppearanceToDefault();
                 });
 
-                Log.e(LOGTAG, "ASR could not be started");
+                Log.e(LOGTAG, "ASR could not be started", e);
                 try {
                     speak(getResources().getString(R.string.asr_notstarted), "ES", ID_PROMPT_INFO);
                 } catch (Exception ex) {
-                    Log.e(LOGTAG, "TTS not accessible");
+                    Log.e(LOGTAG, "TTS not accessible", e);
                 }
 
             }
@@ -389,7 +388,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
             try {
                 speak(msg, "ES", ID_PROMPT_INFO);
             } catch (Exception e) {
-                Log.e(LOGTAG, "TTS not accessible");
+                Log.e(LOGTAG, "TTS not accessible", e);
             }
         }
     }
@@ -430,7 +429,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                 return response;
             } catch (AIServiceException e) {
                 try {
-                    speak("Error al conectarse con Daialog Flou", "ES", ID_PROMPT_INFO);
+                    speak("Error al conectarse con Dialog Flow", "ES", ID_PROMPT_INFO);
                     Log.e(LOGTAG,"Problems retrieving a response");
                 } catch (Exception ex) {
                     Log.e(LOGTAG, "English not available for TTS, default language used instead");

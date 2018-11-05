@@ -40,6 +40,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -90,8 +92,13 @@ public abstract class VoiceActivity extends Activity implements RecognitionListe
             myASR = SpeechRecognizer.createSpeechRecognizer(ctx);
             myASR.setRecognitionListener(this);
         }
-        else
+        else {
             myASR = null;
+            TextView queryResultTextView = findViewById(R.id.queryResult);
+            queryResultTextView.setText("¡Vaya! Tu dispositivo no es compatible con el reconocimiento de voz :(");
+            Button speak = findViewById(R.id.speech_btn);
+            speak.setEnabled(false);
+        }
     }
 
     /**
@@ -533,9 +540,11 @@ public abstract class VoiceActivity extends Activity implements RecognitionListe
 		 						as it is necessary to create a new instance with the new context.
 		 						See here: http://developer.android.com/guide/topics/resources/runtime-changes.html
 							*/
-        myASR.stopListening();
-        myASR.destroy();
-        myASR=null;
+        if(myASR != null) {
+            myASR.stopListening();
+            myASR.destroy();
+            myASR = null;
+        }
     }
 
     /*

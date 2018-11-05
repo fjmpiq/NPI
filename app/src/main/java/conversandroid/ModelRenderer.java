@@ -122,6 +122,7 @@ public class ModelRenderer implements GLSurfaceView.Renderer {
 		Camera camera = scene.getCamera();
 		Matrix.setLookAtM(modelViewMatrix, 0, camera.xPos, camera.yPos, camera.zPos, camera.xView, camera.yView,
 				camera.zView, camera.xUp, camera.yUp, camera.zUp);
+		Matrix.multiplyMM(modelViewMatrix, 0, modelViewMatrix, 0, camera.getRotationMatrix(), 0);
 
 		// the projection matrix is the 3D virtual space (cube) that we want to project
 		float ratio = (float) width / height;
