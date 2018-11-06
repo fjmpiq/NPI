@@ -76,23 +76,45 @@ import conversandroid.talkback.R;
 
 public class MainActivity extends VoiceActivity implements SensorEventListener {
 
+    ///////////////////////////////////////////////////////////////////////////
+    // ATTRIBUTES                                                            //
+    ///////////////////////////////////////////////////////////////////////////
+
     private static final String LOGTAG = "CLEEPY";
     private static final Integer ID_PROMPT_QUERY = 0;
     private static final Integer ID_PROMPT_INFO = 1;
+    // Access to textView
+    private TextView queryResultTextView;
+
+
+    // 3D MODELS
+
+
+    // Parameters for 3D models
+    private Map<String, Object> loadModelParameters = new HashMap<>();
+
+
+    // VOICE AND TEXT
+
 
     private long startListeningTime = 0; // To skip errors (see processAsrError method)
+
+    // Control of the initial prompt
+    boolean initialPromptDone = false;
+
+
+    // DIALOGFLOW INTEGRATION
+
 
     //Connection to DialogFlow
     private AIDataService aiDataService=null;
     // https://dialogflow.com/docs/reference/agent/#obtaining_access_tokens)
 
-    // Access to textView
-    private TextView queryResultTextView;
 
-    // Control of the initial prompt
-    boolean initialPromptDone = false;
 
-    // Sensors
+    // SENSORS
+
+
     SensorManager sManager;
     Sensor proximitySensor;
     Sensor accelSensor;
@@ -102,11 +124,16 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     private float mAccelCurrent; // current acceleration including gravity
     private float mAccelLast; // last acceleration including gravity
 
+
+    // RANDOM ARTWORKS
+
+
     // JSON object with random artworks
     private JSONArray artworks;
 
-    // Parameters for 3D models
-    private Map<String, Object> loadModelParameters = new HashMap<>();
+    ///////////////////////////////////////////////////////////////////////////
+    // METHODS                                                               //
+    ///////////////////////////////////////////////////////////////////////////
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,6 +208,30 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     }
 
+    /**
+     *   Asigns startListening method to the button
+     */
+    private void set3DButton() {
+        // gain reference to speak button
+        Button b3D = findViewById(R.id.launch3d_btn);
+        b3D.setOnClickListener(v -> loadModelFromAssets());
+    }
+
+    private void setQRbutton() {
+        Button qr_button = findViewById(R.id.qr_scanner);
+
+    }
+
+
+    /**
+     * Initializes the text view that will show the answer of the query
+     */
+
+    private void setTextView() {
+        queryResultTextView = findViewById(R.id.queryResult);
+        queryResultTextView.setText(R.string.initial_textView_message);
+
+    }
 
     /**
      *   Asigns startListening method to the button, if it's the first time it's pressed
@@ -192,6 +243,21 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
         speak.setOnClickListener(this::onClick);
     }
+
+    protected void onResume() {
+        super.onResume();
+        sManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    protected void onPause() {
+        super.onPause();
+        sManager.unregisterListener(this);
+    }
+
+
+    // 3D MODELS
+
 
     private void loadModelFromAssets() {
         AssetUtils.createChooserDialog(this, "Elige el modelo", null, "models", "(?i).*\\.(obj|stl|dae)",
@@ -218,30 +284,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         startActivity(intent);
     }
 
-    /**
-     *   Asigns startListening method to the button
-     */
-    private void set3DButton() {
-        // gain reference to speak button
-        Button b3D = findViewById(R.id.launch3d_btn);
-        b3D.setOnClickListener(v -> loadModelFromAssets());
-    }
 
-    private void setQRbutton() {
-        Button qr_button = findViewById(R.id.qr_scanner);
+    // VOICE AND TEXT
 
-    }
-
-
-    /**
-     * Initializes the text view that will show the answer of the query
-     */
-
-    private void setTextView() {
-        queryResultTextView = findViewById(R.id.queryResult);
-        queryResultTextView.setText(R.string.initial_textView_message);
-
-    }
 
     /**
      * Explain to the user why we need their permission to record audio on the device
@@ -409,6 +454,88 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         }
     }
 
+    /**
+     * Checks whether the device is connected to Internet (returns true) or not (returns false)
+     * From: http://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html
+     */
+    public boolean deviceConnectedToInternet() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork;
+        activeNetwork = cm.getActiveNetworkInfo();
+        return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
+    }
+
+    /**
+     * Shuts down the TTS engine when finished
+     */
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        shutdown();
+    }
+
+    /**
+     * Invoked when the TTS has finished synthesizing.
+     *
+     * In this case, it starts recognizing if the message that has just been synthesized corresponds to a question (its id is ID_PROMPT_QUERY),
+     * and does nothing otherwise.
+     *
+     * According to the documentation the speech recognizer must be invoked from the main thread. onTTSDone callback from TTS engine and thus
+     * is not in the main thread. To solve the problem, we use Androids native function for forcing running code on the UI thread
+     * (runOnUiThread).
+
+     *
+     * @param uttId identifier of the prompt that has just been synthesized (the id is indicated in the speak method when the text is sent
+     * to the TTS engine)
+     */
+
+    @Override
+    public void onTTSDone(String uttId) {
+        sManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    /**
+     * Invoked when the TTS encounters an error.
+     *
+     * In this case it just writes in the log.
+     */
+    @Override
+    public void onTTSError(String uttId) {
+        Log.e(LOGTAG, "TTS error");
+    }
+
+    /**
+     * Invoked when the TTS starts synthesizing
+     *
+     * In this case it just writes in the log.
+     */
+    @Override
+    public void onTTSStart(String uttId) {
+        Log.d(LOGTAG, "TTS starts speaking");
+    }
+
+
+    private void onClick(View v) {
+
+        if (!initialPromptDone) {
+            try {
+                speak(getResources().getString(R.string.initial_prompt), "ES", ID_PROMPT_QUERY);
+
+            } catch (Exception e) {
+                Log.e(LOGTAG, "TTS not accessible");
+            }
+            initialPromptDone = true;
+        }
+
+        if(!isTTSSpeaking()) {
+            runOnUiThread(this::startListening);
+        }
+    }
+
+
+    // DIALOGFLOW INTEGRATION
+
+
     private class MyAsyncTaskClass extends AsyncTask<String,Void,AIResponse>{
         /**
          * Connects to the DialogFlow service
@@ -479,67 +606,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     }
 
-    /**
-     * Checks whether the device is connected to Internet (returns true) or not (returns false)
-     * From: http://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html
-     */
-    public boolean deviceConnectedToInternet() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork;
-        activeNetwork = cm.getActiveNetworkInfo();
-        return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
-    }
 
-    /**
-     * Shuts down the TTS engine when finished
-     */
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        shutdown();
-    }
+    // SENSORS
 
-    /**
-     * Invoked when the TTS has finished synthesizing.
-     *
-     * In this case, it starts recognizing if the message that has just been synthesized corresponds to a question (its id is ID_PROMPT_QUERY),
-     * and does nothing otherwise.
-     *
-     * According to the documentation the speech recognizer must be invoked from the main thread. onTTSDone callback from TTS engine and thus
-     * is not in the main thread. To solve the problem, we use Androids native function for forcing running code on the UI thread
-     * (runOnUiThread).
-
-     *
-     * @param uttId identifier of the prompt that has just been synthesized (the id is indicated in the speak method when the text is sent
-     * to the TTS engine)
-     */
-
-    @Override
-    public void onTTSDone(String uttId) {
-        sManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_NORMAL);
-    }
-
-    /**
-     * Invoked when the TTS encounters an error.
-     *
-     * In this case it just writes in the log.
-     */
-    @Override
-    public void onTTSError(String uttId) {
-        Log.e(LOGTAG, "TTS error");
-    }
-
-    /**
-     * Invoked when the TTS starts synthesizing
-     *
-     * In this case it just writes in the log.
-     */
-    @Override
-    public void onTTSStart(String uttId) {
-        Log.d(LOGTAG, "TTS starts speaking");
-    }
-
-    // Implementation of sensor methods
 
     /**
      * @brief Sets up sensors and its manager
@@ -550,20 +619,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         accelSensor = sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
-    /**
-     *
-     */
-
-    protected void onResume() {
-        super.onResume();
-        sManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
-        sManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_NORMAL);
-    }
-
-    protected void onPause() {
-        super.onPause();
-        sManager.unregisterListener(this);
-    }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
@@ -590,7 +645,10 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         }
     }
 
-    // Called when device is shaken
+
+    /**
+     * @brief Called when device is shaken
+     */
     private void onShake(){
         Toast toast = Toast.makeText(getApplicationContext(), R.string.onShake_toast, Toast.LENGTH_LONG);
         toast.show();
@@ -606,7 +664,13 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         queryResultTextView.setText(msg); // The response will be displayed by text
     }
 
-    // Randomly selects and artwork and shows information about it
+
+    // RANDOM ARTWORKS
+
+
+    /**
+     * @brief Randomly selects and artwork and shows information about it
+     */
     private String randArtwork(){
         String artworkName = null;
         String artworkCreator = null;
@@ -640,22 +704,5 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         
         msg = String.format("%s es una obra de %s que data del %s. Se encuentra en %s, %s.", artworkName, artworkCreator, artworkInception, artworkLoc, artworkCountry);
         return msg;
-    }
-
-    private void onClick(View v) {
-
-        if (!initialPromptDone) {
-            try {
-                speak(getResources().getString(R.string.initial_prompt), "ES", ID_PROMPT_QUERY);
-
-            } catch (Exception e) {
-                Log.e(LOGTAG, "TTS not accessible");
-            }
-            initialPromptDone = true;
-        }
-
-        if(!isTTSSpeaking()) {
-            runOnUiThread(this::startListening);
-        }
     }
 }
