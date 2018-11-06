@@ -687,16 +687,15 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
             try {
                 artworkName = artworks.getJSONObject(randIndex).getString("itemLabel");
+                artworkLoc = artworks.getJSONObject(randIndex).getString("locLabel");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        } while (artworkName.matches(illegalNameRegex));
+        } while (artworkName.matches(illegalNameRegex) || artworkLoc.matches(illegalNameRegex));
 
         try {
-            artworkName = artworks.getJSONObject(randIndex).getString("itemLabel");
             artworkCreator = artworks.getJSONObject(randIndex).getString("creatorLabel");
             artworkCountry = artworks.getJSONObject(randIndex).getString("countryLabel");
-            artworkLoc = artworks.getJSONObject(randIndex).getString("locLabel");
             artworkInception = artworks.getJSONObject(randIndex).getString("inception").split("-")[0];
         } catch (JSONException e) {
             e.printStackTrace();
