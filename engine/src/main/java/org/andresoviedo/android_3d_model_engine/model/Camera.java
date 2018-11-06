@@ -223,77 +223,7 @@ public class Camera {
 		return false;
 	}
 
-	public void StrafeCam(float dX, float dY) {
-		// Now if we were to call UpdateCamera() we will be moving the camera
-		// foward or backwards.
-		// We don't want that here. We want to strafe. To do so we have to get
-		// the cross product
-		// of our direction and Up direction view. The up was set in SetCamera
-		// to be 1 positive
-		// y. That is because anything positive on the y is considered up. After
-		// we get the
-		// cross product we can save it to the strafe variables so that can be
-		// added to the
-		// camera using UpdateCamera().
-
-		float vlen;
-
-		// Translating the camera requires a directional vector to rotate
-		// First we need to get the direction at which we are looking.
-		// The look direction is the view minus the position (where we are).
-		// Get the Direction of the view.
-		float xLook = 0, yLook = 0, zLook = 0;
-		xLook = xView - xPos;
-		yLook = yView - yPos;
-		zLook = zView - zPos;
-		vlen = Matrix.length(xLook, yLook, zLook);
-		xLook /= vlen;
-		yLook /= vlen;
-		zLook /= vlen;
-
-		// Next we get the axis which is a perpendicular vector of the view
-		// direction and up values.
-		// We use the cross product of that to get the axis then we normalize
-		// it.
-		float xArriba = 0, yArriba = 0, zArriba = 0;
-		xArriba = xUp - xPos;
-		yArriba = yUp - yPos;
-		zArriba = zUp - zPos;
-		// Normalize the Right.
-		vlen = Matrix.length(xArriba, yArriba, zArriba);
-		xArriba /= vlen;
-		yArriba /= vlen;
-		zArriba /= vlen;
-
-		// Get the cross product of the direction and the up.
-		float xRight = 0, yRight = 0, zRight = 0;
-		xRight = (yLook * zArriba) - (zLook * yArriba);
-		yRight = (zLook * xArriba) - (xLook * zArriba);
-		zRight = (xLook * yArriba) - (yLook * xArriba);
-		// Normalize the Right.
-		vlen = Matrix.length(xRight, yRight, zRight);
-		xRight /= vlen;
-		yRight /= vlen;
-		zRight /= vlen;
-
-		// Calculate sky / up
-		float xSky = 0, ySky = 0, zSky = 0;
-
-		// Get the cross product of the direction and the up.
-		xSky = (yRight * zLook) - (zRight * yLook);
-		ySky = (zRight * xLook) - (xRight * zLook);
-		zSky = (xRight * yLook) - (yRight * xLook);
-		// Normalize the sky / up.
-		vlen = Matrix.length(xSky, ySky, zSky);
-		xSky /= vlen;
-		ySky /= vlen;
-		zSky /= vlen;
-
-		// UpdateCamera(xRight, yRight, zRight, dX);
-		UpdateCamera(xSky, ySky, zSky, dX);
-	}
-
-	private void RotateCamera(float AngleDir, float xSpeed, float ySpeed, float zSpeed) {
+	public void RotateCamera(float AngleDir, float xSpeed, float ySpeed, float zSpeed) {
 		float xNewLookDirection = 0, yNewLookDirection = 0, zNewLookDirection = 0;
 		float xLookDirection = 0, yLookDirection = 0, zLookDirection = 0;
 		float CosineAngle = 0, SineAngle = 0;

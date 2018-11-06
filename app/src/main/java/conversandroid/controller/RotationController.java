@@ -57,7 +57,7 @@ public class RotationController implements SensorEventListener{
             } else{
                 SensorManager.getRotationMatrixFromVector(
                         mRotationMatrix , event.values);
-                Matrix.multiplyMM(mRotationMatrix, 0, initialRotMatrix, 0, mRotationMatrix, 0);
+                 Matrix.multiplyMM(mRotationMatrix, 0, initialRotMatrix, 0, mRotationMatrix, 0);
                 SceneLoader scene = view.getModelActivity().getScene();
                 Camera camera = scene.getCamera();
                 camera.RotateM(mRotationMatrix);

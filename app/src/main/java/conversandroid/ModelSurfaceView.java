@@ -37,7 +37,7 @@ public class ModelSurfaceView extends GLSurfaceView implements SensorEventListen
 
 		// Render the view only when there is a change in the drawing data
 		// TODO: enable this?
-		// setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+		//setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
 		touchHandler = new TouchController(this, mRenderer);
 		rotHandler = new RotationController(this, mRenderer,parent.getSensorManager());

@@ -2,11 +2,17 @@ package conversandroid;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import conversandroid.demo.ExampleSceneLoader;
@@ -81,6 +87,19 @@ public class ModelActivity extends Activity {
         sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         gLView = new ModelSurfaceView(this);
         setContentView(gLView);
+        addTitle(b.getString("name"));
+    }
+
+    public void addTitle(String name){
+        TextView mTextView = new TextView(this);
+        mTextView.setText(name);
+        mTextView.setTextColor(Color.WHITE);
+        mTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 26);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.TOP| Gravity.RIGHT;
+        params.topMargin = 30;
+        params.rightMargin = 50;
+        addContentView(mTextView, params);
     }
 
     @Override

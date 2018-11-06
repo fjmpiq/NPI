@@ -198,17 +198,17 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                 (String file) -> {
                     if (file != null) {
                         ContentUtils.provideAssets(this);
-                        launchModelRendererActivity(Uri.parse("assets://" + getPackageName() + "/" + file));
+                        launchModelRendererActivity(Uri.parse("assets://" + getPackageName() + "/" + file),file);
                     }
                 });
     }
 
 
-    private void launchModelRendererActivity(Uri uri) {
+    private void launchModelRendererActivity(Uri uri, String name) {
         Log.i("Menu", "Launching renderer for '" + uri + "'");
         Intent intent = new Intent(getApplicationContext(), ModelActivity.class);
         intent.putExtra("uri", uri.toString());
-
+        intent.putExtra("name", name);
         // content provider case
         if (!loadModelParameters.isEmpty()) {
             intent.putExtra("type", loadModelParameters.get("type").toString());

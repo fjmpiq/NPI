@@ -150,19 +150,13 @@ public class ModelRenderer implements GLSurfaceView.Renderer {
 
 		// recalculate mvp matrix according to where we are looking at now
 		Camera camera = scene.getCamera();
-		if(camera.hasChangedRotMatrix()){
+		if(camera.hasChangedRotMatrix() || camera.hasChanged()){
 			Matrix.setLookAtM(modelViewMatrix, 0, camera.xPos, camera.yPos, camera.zPos, camera.xView, camera.yView, camera.zView, camera.xUp, camera.yUp, camera.zUp);
 			Matrix.multiplyMM(modelViewMatrix, 0, modelViewMatrix, 0, camera.getRotationMatrix(), 0);
 			Matrix.multiplyMM(mvpMatrix, 0, modelProjectionMatrix, 0, modelViewMatrix, 0);
 			camera.setChangedRotMatrix(false);
-		} else if (camera.hasChanged()) {
-			Matrix.setLookAtM(modelViewMatrix, 0, camera.xPos, camera.yPos, camera.zPos, camera.xView, camera.yView,
-					camera.zView, camera.xUp, camera.yUp, camera.zUp);
-			// Log.d("Camera", "Changed! :"+camera.ToStringVector());
-			Matrix.multiplyMM(mvpMatrix, 0, modelProjectionMatrix, 0, modelViewMatrix, 0);
 			camera.setChanged(false);
 		}
-
 
 		// draw light
 		if (scene.isDrawLighting()) {
