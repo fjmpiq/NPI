@@ -274,6 +274,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
 
     private void launchModelRendererActivity(Uri uri, String name) {
+        ContentUtils.provideAssets(this); /////
         Log.i("Menu", "Launching renderer for '" + uri + "'");
         Intent intent = new Intent(getApplicationContext(), ModelActivity.class);
         intent.putExtra("uri", uri.toString());
@@ -579,11 +580,16 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                 Log.d(LOGTAG,"Action: " + result.getAction());
 
                 final String chatbotResponse = result.getFulfillment().getSpeech();
-                try {
-                    speak(chatbotResponse, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is neccessary to include a special "last_exchange" intent in dialogflow and process it here
-                    //so that the last system answer is synthesized using ID_PROMPT_INFO.
-                } catch (Exception e) { Log.e(LOGTAG, "TTS not accessible"); }
-                queryResultTextView.setText(chatbotResponse); // The response will be displayed by text
+                if (chatbotResponse.matches(".+\\.obj")) {
+                    launchModelRendererActivity(Uri.parse("assets://" + getPackageName() + "/" + chatbotResponse), chatbotResponse);
+                }
+                else {
+                    try {
+                        speak(chatbotResponse, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is neccessary to include a special "last_exchange" intent in dialogflow and process it here
+                        //so that the last system answer is synthesized using ID_PROMPT_INFO.
+                        queryResultTextView.setText(chatbotResponse); // The response will be displayed by text
+                    } catch (Exception e) { Log.e(LOGTAG, "TTS not accessible"); };
+                }
 
             }
         }
