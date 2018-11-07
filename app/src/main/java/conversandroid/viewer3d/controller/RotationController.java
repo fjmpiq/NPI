@@ -1,16 +1,15 @@
-package conversandroid.controller;
+package conversandroid.viewer3d.controller;
 
 import org.andresoviedo.android_3d_model_engine.model.Camera;
 
-import conversandroid.ModelRenderer;
-import conversandroid.ModelSurfaceView;
-import conversandroid.demo.SceneLoader;
+import conversandroid.viewer3d.ModelRenderer;
+import conversandroid.viewer3d.ModelSurfaceView;
+import conversandroid.viewer3d.demo.SceneLoader;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.opengl.Matrix;
-import android.util.Log;
 
 public class RotationController implements SensorEventListener{
 

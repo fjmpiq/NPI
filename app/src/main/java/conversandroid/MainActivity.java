@@ -21,10 +21,8 @@
 package conversandroid;
 
 
-import android.content.ActivityNotFoundException; // Launch intent
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager; // Launch intent
 import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -68,6 +66,7 @@ import ai.api.model.AIResponse;
 import ai.api.model.Result;
 
 import conversandroid.talkback.R;
+import conversandroid.viewer3d.ModelActivity;
 
 
 /**
@@ -156,7 +155,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         setSpeakButton();
 
         // Set up the 3D button
-        set3DButton();
+        setExtraButtons();
 
         // Set up the QR button
 
@@ -212,15 +211,18 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     /**
      *   Asigns startListening method to the button
      */
-    private void set3DButton() {
+    private void setExtraButtons() {
         // gain reference to speak button
         Button b3D = findViewById(R.id.launch3d_btn);
         b3D.setOnClickListener(v -> loadModelFromAssets());
-    }
 
-    private void setQRbutton() {
         Button qr_button = findViewById(R.id.qr_scanner);
 
+        Button options_button = findViewById(R.id.options_button);
+        options_button.setOnClickListener(v ->{
+            Intent intent = new Intent(getApplicationContext(), OptionsActivity.class);
+            startActivity(intent);
+        });
     }
 
 

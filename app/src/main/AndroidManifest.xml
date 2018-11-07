@@ -21,12 +21,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="conversandroid.ModelActivity"
+            android:name="conversandroid.viewer3d.ModelActivity"
             android:label="Visor"
             android:parentActivityName="conversandroid.MainActivity" >
 
             <!-- android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" -->
         </activity>
+        <activity android:name="conversandroid.OptionsActivity" />
     </application>
 
 </manifest>

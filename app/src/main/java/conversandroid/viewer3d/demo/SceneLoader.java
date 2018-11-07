@@ -1,4 +1,4 @@
-package conversandroid.demo;
+package conversandroid.viewer3d.demo;
 
 import android.net.Uri;
 import android.os.SystemClock;
@@ -14,8 +14,8 @@ import org.andresoviedo.android_3d_model_engine.services.Object3DBuilder;
 import org.andresoviedo.android_3d_model_engine.services.collada.ColladaLoaderTask;
 import org.andresoviedo.android_3d_model_engine.services.stl.STLLoaderTask;
 import org.andresoviedo.android_3d_model_engine.services.wavefront.WavefrontLoaderTask;
-import conversandroid.ModelActivity;
-import conversandroid.ModelRenderer;
+import conversandroid.viewer3d.ModelActivity;
+import conversandroid.viewer3d.ModelRenderer;
 import org.andresoviedo.util.android.ContentUtils;
 import org.andresoviedo.util.io.IOUtils;
 

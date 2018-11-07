@@ -1,4 +1,4 @@
-package conversandroid.demo;
+package conversandroid.viewer3d.demo;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import org.andresoviedo.android_3d_model_engine.model.Object3DData;
 import org.andresoviedo.android_3d_model_engine.services.Object3DBuilder;
-import conversandroid.ModelActivity;
+import conversandroid.viewer3d.ModelActivity;
 import org.andresoviedo.util.android.ContentUtils;
 import org.andresoviedo.util.io.IOUtils;
 

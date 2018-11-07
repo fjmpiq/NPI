@@ -1,4 +1,4 @@
-package conversandroid.controller;
+package conversandroid.viewer3d.controller;
 
 import android.graphics.PointF;
 import android.opengl.Matrix;
@@ -9,9 +9,9 @@ import android.view.View;
 import android.widget.ImageView;
 
 import org.andresoviedo.android_3d_model_engine.model.Camera;
-import conversandroid.demo.SceneLoader;
-import conversandroid.ModelRenderer;
-import conversandroid.ModelSurfaceView;
+import conversandroid.viewer3d.demo.SceneLoader;
+import conversandroid.viewer3d.ModelRenderer;
+import conversandroid.viewer3d.ModelSurfaceView;
 
 public class TouchController {
 

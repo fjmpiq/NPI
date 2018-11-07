@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -21,26 +22,42 @@
     <TextView
         android:id="@+id/queryResult"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="165dp"
+        android:layout_marginTop="101dp"
         android:textAlignment="center" />
 
     <Button
         android:id="@+id/launch3d_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/speech_btn"
-        android:layout_alignBottom="@+id/queryResult"
-        android:text="@string/button" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="46dp"
+        android:layout_marginEnd="39dp"
+        android:layout_marginBottom="17dp"
+        android:layout_toStartOf="@+id/options_button"
+        android:layout_toEndOf="@+id/qr_scanner"
+        android:text="3D" />
 
     <Button
         android:id="@+id/qr_scanner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/queryResult"
         android:layout_alignStart="@+id/speech_btn"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginBottom="17dp"
         android:text="@string/qr_button_text" />
+
+    <Button
+        android:id="@+id/options_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/speech_btn"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="17dp"
+        android:text="Opciones" />
 
 </RelativeLayout>
