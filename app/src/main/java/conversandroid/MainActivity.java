@@ -20,11 +20,6 @@
  */
 package conversandroid;
 
-/**
- *
- * @author @mx_psi, @fjmpiq, @jojelupipa, Michael McTear, David Griol
- * @version 4.0, 04/06/18
- */
 
 import android.content.ActivityNotFoundException; // Launch intent
 import android.content.Context;
@@ -74,6 +69,12 @@ import ai.api.model.Result;
 
 import conversandroid.talkback.R;
 
+
+/**
+ *
+ * @author @mx_psi, @fjmpiq, @jojelupipa, Michael McTear, David Griol
+ * @version 4.0, 04/06/18
+ */
 public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -264,7 +265,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                 (String file) -> {
                     if (file != null) {
                         ContentUtils.provideAssets(this);
-                        launchModelRendererActivity(Uri.parse("assets://" + getPackageName() + "/" + file),file);
+                        launchModelRendererActivity(Uri.parse("assets://" + getPackageName() + "/" + file), file);
                     }
                 });
     }
@@ -276,11 +277,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         intent.putExtra("uri", uri.toString());
         intent.putExtra("name", name);
         // content provider case
-        if (!loadModelParameters.isEmpty()) {
-            intent.putExtra("type", loadModelParameters.get("type").toString());
-            loadModelParameters.clear();
-        }
-
         startActivity(intent);
     }
 
@@ -589,7 +585,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
             }
         }
-    };
+    }
 
     /**
      * Connects to DialogFlow sending the user input in text form
