@@ -662,6 +662,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         try {
             speak(msg, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is necessary to include a special "last_exchange" intent in dialogflow and process it here
             //so that the last system answer is synthesized using ID_PROMPT_INFO.
+            initialPromptDone = true;
         } catch (Exception e) {
             Log.e(LOGTAG, "TTS not accessible");
         }
