@@ -18,6 +18,7 @@ toc: true
 
 # Introducción e idea de museo
 
+TODO 
 *Musemium*
 
 # Funcionamiento de la aplicación
@@ -53,19 +54,57 @@ También permite interactuar con otras partes de la aplicación como el visor 3D
 
 TODO: No sé qué va aquí
 
-### Integración con DialogFlow
-
-### Funcionamiento de DialogFlow
+### Consultas posibles
 
 Distinguimos dos tipos básicos de consultas que podemos hacer en DialogFlow: las consultas que hacen uso de Wikidata y las que no. Para cada consulta damos un ejemplo de posible frase a probar entre paréntesis y en cursiva para ver qué responde el bot.
 
 Las consultas que no hacen uso de Wikidata son:
 
-- Pedir ayuda sobre el funcionamiento de la aplicación (*Ayúdame*). La aplicación sugiere posibles preguntas y ayuda.
-  Implementado en el intent `AyudaMuseo`.
-- Responder a saludos (*Hola*). Implementado en `Default Welcome Intent`.
-- Responder a despedidas (*Adiós*). Implementado en `DespedidaBot`.
-- Responder a preguntas sobre el horario del museo 
+|Nombre | Descripción | Ejemplo|
+|------------------|-------------|--------------------|
+| `AyudaMuseo` | Proveer ayuda | *Ayúdame* |
+| `Default Welcome Intent` | Responder a saludos | *Hola* |
+| `DespedidaBot` | Responder a despedidas | *Adiós* |
+| `HorarioMuseo` | Responder a preguntas sobre el horario del museo | *¿Cuándo cerráis?* |
+| `MuestraModelo` | Mostrar un modelo 3D en el visor 3D | *Enséñame el David* |
+| `NombreAgente` | Indicar cuál es su nombre | *¿Cómo te llamas?* |
+| `NombreMuseo` | Indicar cuál es el nombre del museo | *¿Cómo se llama el museo?* |
+| `PrecioEntradaMuseo` | Indicar el precio de la entrada del museo | *¿Qué precio tienen las entradas?* |
+| `Preguntas personales` | Responder a preguntas personales | *Te quiero* |
+| `SmallTalk` | Responder a preguntas sobre su estado de ánimo | *¿Cómo estás?* |
+
+Estas consultas se implementan con un intent que proporciona una respuesta aleatoria a la pregunta o frase del usuario, exceptuando la consulta `MuestraModelo`, que utiliza una entidad que guarda los posibles nombres de las obras de arte.
+
+Las consultas que hacen uso de Wikidata son:
+
+|Nombre | Descripción | Ejemplo|
+|------------------|-------------|--------------------|
+| | | |
+| | | |
+| | | |
+| | | |
+| | | |
+| | | |
+| | | |
+| | | |
+
+Para Wikidata hacemos uso Pubnub, con el código que puede consultarse en el fichero adjunto `pubnub.js`.
+
+El funcionamiento básico es el siguiente: cada intent de esta lista tiene una función asociada que realiza una consulta en Wikidata utilizando el lenguaje SPARQL. Si la consulta:
+
+- Tiene éxito, se devuelve una respuesta que contiene la información solicitada, ajustando en la medida de lo posible los artículos femeninos y masculinos al género de las personas mencionadas.
+- Falla una vez, se prueba de nuevo eliminando los artículos iniciales.
+- Falla dos veces, se devuelve un mensaje de error genérico asociado al intent.
+
+A continuación vemos un ejemplo de función que resuelve una consulta.
+
+
+
+
+### Funcionamiento de DialogFlow y Wikidata
+### Integración con DialogFlow
+
+TODO: 
 
 ## Interfaz sensorial
 
@@ -190,3 +229,6 @@ Atributos en MainActivity:
 Métodos en MainActivity:
 
 - randArtwork
+
+
+# Código externo utilizado
