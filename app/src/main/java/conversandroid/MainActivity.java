@@ -217,10 +217,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     }
 
     /**
-     *   Asigns startListening method to the button
+     *   Asigns listeners to buttons
      */
     private void setExtraButtons() {
-        // gain reference to speak button
         Button b3D = findViewById(R.id.launch3d_btn);
         b3D.setOnClickListener(v -> loadModelFromAssets());
 
@@ -238,8 +237,8 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == SETTINGS_REQUEST && resultCode == Activity.RESULT_OK) {
+            // Actualiza umbral de aceleración en función de las opciones
             accelThreshold = data.getIntExtra("accelThreshold", accelThreshold);
-            Toast.makeText(getApplicationContext(), "Modificado umbral de aceleración a " + Integer.toString(accelThreshold), Toast.LENGTH_SHORT).show();
         }
     }
 

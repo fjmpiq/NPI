@@ -3,7 +3,6 @@ package conversandroid;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -11,8 +10,6 @@ import conversandroid.talkback.R;
 
 
 public class OptionsActivity extends Activity {
-    int accelThreshold;
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.options_layout);
@@ -27,8 +24,7 @@ public class OptionsActivity extends Activity {
 
         shakeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                accelThreshold = progress;
-                shakeValue.setText(Integer.toString(accelThreshold));
+                shakeValue.setText(Integer.toString(progress));
             }
             public void onStartTrackingTouch(SeekBar seekBar) {}
             public void onStopTrackingTouch(SeekBar seekBar) {}
@@ -38,6 +34,8 @@ public class OptionsActivity extends Activity {
     @Override
     public void onBackPressed() {
         Intent previousScreen = new Intent(getApplicationContext(), MainActivity.class);
+        SeekBar shakeBar = findViewById(R.id.shake_bar);
+        int accelThreshold = shakeBar.getProgress();
         setResult(Activity.RESULT_OK, previousScreen.putExtra("accelThreshold", accelThreshold));
         finish();
     }
