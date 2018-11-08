@@ -89,6 +89,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     private static final Integer ID_PROMPT_QUERY = 0;
     private static final Integer ID_PROMPT_INFO = 1;
     private static final int SETTINGS_REQUEST = 0;
+    private static final int SCAN_REQUEST = 1;
     // Access to textView
     private TextView queryResultTextView;
 
@@ -139,6 +140,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     // CAMERA INTEGRATION
     private final int MY_PERMISSIONS_CAMERA = 23; // Const to request permission
+    String scannedCode = new String();
 
     ///////////////////////////////////////////////////////////////////////////
     // METHODS                                                               //
@@ -240,6 +242,11 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
             // Actualiza umbral de aceleración en función de las opciones
             accelThreshold = data.getIntExtra("accelThreshold", accelThreshold);
         }
+
+        if(requestCode == SCAN_REQUEST && resultCode == Activity.RESULT_OK) {
+            scannedCode = data.getStringExtra("scannedCode");
+            sendMsgToChatBot("quién pintó " + scannedCode);
+        }
     }
 
 
@@ -305,11 +312,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     private void qrScan() {
         if(checkScanPermissions()){
-            // TODO: QR code implementation
             Intent intent = new Intent(getApplicationContext(), DecoderActivity.class);
-
-            // content provider case
-            startActivity(intent);
+            intent.putExtra("scannedCode", scannedCode);
+            startActivityForResult(intent,SCAN_REQUEST);
         }
 
     }

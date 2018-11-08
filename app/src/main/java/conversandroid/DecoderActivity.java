@@ -1,6 +1,8 @@
 package conversandroid;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.PointF;
 import android.os.Bundle;
@@ -8,8 +10,10 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
@@ -33,7 +37,6 @@ public class DecoderActivity extends AppCompatActivity
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_decoder);
 
         mainLayout = (ViewGroup) findViewById(R.id.main_layout);
@@ -83,6 +86,11 @@ public class DecoderActivity extends AppCompatActivity
     @Override public void onQRCodeRead(String text, PointF[] points) {
         resultTextView.setText(text);
         pointsOverlayView.setPoints(points);
+        Log.e("i", "He leido esto: " + text);
+
+        Intent previousScreen = new Intent(getApplicationContext(), MainActivity.class);
+        setResult(Activity.RESULT_OK, previousScreen.putExtra("scannedCode", text));
+        finish();
     }
 
     private void requestCameraPermission() {
@@ -127,5 +135,9 @@ public class DecoderActivity extends AppCompatActivity
             }
         });
         qrCodeReaderView.startCamera();
+    }
+
+    private void onClick() {
+        Log.e("i","Pulsaboton");
     }
 }
