@@ -306,6 +306,10 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     private void qrScan() {
         if(checkScanPermissions()){
             // TODO: QR code implementation
+            Intent intent = new Intent(getApplicationContext(), DecoderActivity.class);
+
+            // content provider case
+            startActivity(intent);
         }
 
     }
@@ -318,6 +322,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
             ActivityCompat.requestPermissions(ctx,
                     new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_CAMERA);
+            return false;
         } else {
             return true;
         }
