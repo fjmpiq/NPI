@@ -32,10 +32,12 @@ Thumbs.db
 build/
 .navigation
 captures/
-output.json 
+output.json
 
 #NDK
 obj/
 .externalNativeBuild
 app/build.gradle
 app/build.gradle
+
+*.pdf
