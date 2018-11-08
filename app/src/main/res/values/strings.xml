@@ -34,6 +34,8 @@
     <string name="asr_error_speechtimeout">No he escuchado correctamente. Por favor, repite la pregunta</string>
     <string name="asr_notstarted">No se ha podido comenzar la grabación</string>
 
+    <!-- Camera -->
+    <string name="camera_permissions_denied">Por favor, permita el acceso a la cámara para poder usar el lector de QR</string>
     <!-- onShake messages -->
     <string name="onShake_toast">Has agitado el dispositivo. Esto muestra información sobre una obra al azar.</string>
     <string name="randArtWork_msg">%s es una obra de %s que data del %s. Se encuentra en %s, %s.</string>

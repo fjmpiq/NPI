@@ -21,9 +21,11 @@
 package conversandroid;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -32,6 +34,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -133,6 +137,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     // JSON object with random artworks
     private JSONArray artworks;
 
+    // CAMERA INTEGRATION
+    private final int MY_PERMISSIONS_CAMERA = 23; // Const to request permission
+
     ///////////////////////////////////////////////////////////////////////////
     // METHODS                                                               //
     ///////////////////////////////////////////////////////////////////////////
@@ -156,10 +163,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         //Set up the speech button
         setSpeakButton();
 
-        // Set up the 3D button
+        // Set up the 3D, settings and qr buttons
         setExtraButtons();
 
-        // Set up the QR button
 
         //Dialogflow configuration parameters
         String ACCESS_TOKEN = "c9d250a9a574465cacf77f7117c472f4 ";
@@ -219,6 +225,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         b3D.setOnClickListener(v -> loadModelFromAssets());
 
         Button qr_button = findViewById(R.id.qr_scanner);
+        qr_button.setOnClickListener(v->qrScan());
 
         Button options_button = findViewById(R.id.options_button);
         options_button.setOnClickListener(v ->{
@@ -258,6 +265,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         speak.setOnClickListener(this::onClick);
     }
 
+
     protected void onResume() {
         super.onResume();
         sManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
@@ -292,6 +300,28 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         intent.putExtra("name", name);
         // content provider case
         startActivity(intent);
+    }
+
+    // QR SCANNING
+
+    private void qrScan() {
+        if(checkScanPermissions()){
+            // TODO: QR code implementation
+        }
+
+    }
+
+    private boolean checkScanPermissions(){
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.e("i", "No hay permisos para la cámara");
+
+            ActivityCompat.requestPermissions(ctx,
+                    new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_CAMERA);
+        } else {
+            return true;
+        }
     }
 
 
@@ -524,6 +554,30 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         Log.d(LOGTAG, "TTS starts speaking");
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode,permissions,grantResults);
+
+        if(requestCode == MY_PERMISSIONS_CAMERA){
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.i(LOGTAG, "Camera permission granted");
+            } else {
+                Log.i(LOGTAG, "Camera permission denied");
+                onCameraPermissionDenied();
+            }
+        }
+    }
+
+    private void onCameraPermissionDenied() {
+        if(!isTTSSpeaking()) {
+            try {
+                speak(getResources().getString(R.string.camera_permissions_denied), "ES", ID_PROMPT_QUERY);
+
+            } catch (Exception e) {
+                Log.e(LOGTAG, "TTS not accessible");
+            }
+        }
+    }
 
     private void onClick(View v) {
 
