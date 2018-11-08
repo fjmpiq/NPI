@@ -21,6 +21,7 @@
 package conversandroid;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
@@ -83,6 +84,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     private static final String LOGTAG = "CLEEPY";
     private static final Integer ID_PROMPT_QUERY = 0;
     private static final Integer ID_PROMPT_INFO = 1;
+    private static final int SETTINGS_REQUEST = 0;
     // Access to textView
     private TextView queryResultTextView;
 
@@ -123,7 +125,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     private float mAccel; // acceleration apart from gravity
     private float mAccelCurrent; // current acceleration including gravity
     private float mAccelLast; // last acceleration including gravity
-
+    private int accelThreshold = 12; // acceleration
 
     // RANDOM ARTWORKS
 
@@ -221,8 +223,17 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         Button options_button = findViewById(R.id.options_button);
         options_button.setOnClickListener(v ->{
             Intent intent = new Intent(getApplicationContext(), OptionsActivity.class);
-            startActivity(intent);
+            intent.putExtra("curAccelThreshold", accelThreshold);
+            startActivityForResult(intent,SETTINGS_REQUEST);
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == SETTINGS_REQUEST && resultCode == Activity.RESULT_OK) {
+            accelThreshold = data.getIntExtra("accelThreshold", accelThreshold);
+            Toast.makeText(getApplicationContext(), "Modificado umbral de aceleración a " + Integer.toString(accelThreshold), Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -637,7 +648,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
             mAccelCurrent = (float) Math.sqrt((double) (x * x + y * y + z * z));
             float delta = mAccelCurrent - mAccelLast;
             mAccel = mAccel * 0.9f + delta; // perform low-cut filter
-            if (mAccel > 12) {
+            if (mAccel > accelThreshold) {
                 onShake();
             }
         }
