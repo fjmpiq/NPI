@@ -15,22 +15,22 @@
     <string name="asr_permission">Necesito el micrófono para funcionar :(</string>
     <string name="asr_permission_notgranted">Lo siento, la aplicación no puede funcionar sin el micrófono. Acepta para que pueda ayudarte.</string>
     <string name="asr_notsupported">ASR no es soportado :(</string>
-    <string name="asr_results">Results ready :D</string>
-    <string name="asr_invalid_params">Invalid parameters for recognition</string>
+    <string name="asr_results">Los resultados están disponibles</string>
+    <string name="asr_invalid_params">Parámetros inválidos para reconocimiento</string>
     <string name="asr_error">No he podido escuchar bien</string>
     <string name="asr_readyforspeech">¡Ya puedes hablar!</string>
-    <string name="asr_beginningofspeech">You have started talking ;)</string>
-    <string name="asr_buffer">Buffer received</string>
-    <string name="asr_endofspeech">You have stopped talking</string>
-    <string name="asr_parcialresult">Parcial results received</string>
-    <string name="asr_error_audio"> Audio recording error</string>
-    <string name="asr_error_client">Unknown client side error</string>
+    <string name="asr_beginningofspeech">Has empezado a hablar ;)</string>
+    <string name="asr_buffer">Buffer recibido</string>
+    <string name="asr_endofspeech">Has parado de hablar</string>
+    <string name="asr_parcialresult">Resultados parciales recibidos</string>
+    <string name="asr_error_audio"> Error de reconocimiento de audio</string>
+    <string name="asr_error_client">Oops, ha habido un error desconocido por parte del cliente. Inténtalo de nuevo.</string>
     <string name="asr_error_permissions">Por favor, necesito permiso para acceder al micrófono para escuchar tus preguntas.</string>
-    <string name="asr_error_network">Network related error</string>
-    <string name="asr_error_networktimeout">Network operation timed out</string>
+    <string name="asr_error_network">Oops, ha habido un error relacionado con la red. Inténtalo de nuevo.</string>
+    <string name="asr_error_networktimeout">Oops, se ha perdido la conexión. Inténtalo de nuevo.</string>
     <string name="asr_error_nomatch">No he podido procesar correctamente la pregunta</string>
     <string name="asr_error_recognizerbusy">Por favor no me satures. Déjame un momento que estoy procesando la petición</string>
-    <string name="asr_error_server">Server sends error status</string>
+    <string name="asr_error_server">Oops, el servidor manda un estado de error.</string>
     <string name="asr_error_speechtimeout">No he escuchado correctamente. Por favor, repite la pregunta</string>
     <string name="asr_notstarted">No se ha podido comenzar la grabación</string>
 
@@ -46,7 +46,7 @@
     <string name="title_activity_main">MainActivity</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="initial_textView_message">Aquí se mostrará el resultado de la consulta. Puedes hacerme una pregunta, ¿no conoces la colección del museo? Tenemos a disposición obras de museos de todo el mundo. ¿Necesistas inspiración? Prueba a agitar el dispositivo para que muestre una obra al azar.</string>
+    <string name="initial_textView_message">Puedes hacerme una pregunta, ¿no conoces la colección del museo? Tenemos a disposición obras de museos de todo el mundo. \n\n ¿Necesitas inspiración? Prueba a agitar el dispositivo para que muestre una obra al azar.</string>
     <string name="button">Ver 3D</string>
     <string name="qr_button_text">QR</string>
 </resources>
