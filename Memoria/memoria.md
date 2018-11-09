@@ -79,9 +79,16 @@ También permite interactuar con otras partes de la aplicación como el visor 3D
 
 ### Sintetización y transcripción de voz
 
-TODO: No sé qué va aquí
+La interacción con el sistema se hace principalmente mediante el uso del lenguaje natural por voz pulsando el Botón de habla.
+El primer mensaje que el usuario escucha de la aplicación es un mensaje de bienvenida que presenta al agente conversacional.
+Las sucesivas veces que el usuario presione el botón de habla el bot intentará dar una respuesta apropiada a las peticiones de información del usuario sobre las obras de arte.
 
-### Consultas posibles
+La sintetización y transcripción de voz se hacen utilizando las librerías de Google disponibles en los dispositivos móviles (ver sección [Recursos externos utilizados] para más detalles).
+En el caso de que estas librerías no estén disponibles o de que el usuario no de permisos para escuchar la aplicación indicará mediante el uso de la región de texto y mensajes *Toast* la funcionalidad faltante, y desactivará las partes de la aplicación que no estén disponibles.
+
+### Integración con DialogFlow y consultas posibles
+
+Una vez la aplicación ha conseguido la transcripción de la consulta del usuario esta se envía al sistema de DialogFlow que gestiona y devuelve una respuesta adecuada a la pregunta del usuario o una respuesta genérica en otro caso.
 
 Distinguimos dos tipos básicos de consultas que podemos hacer en DialogFlow: las consultas que hacen uso de Wikidata y las que no. Para cada consulta damos un ejemplo de posible frase a probar entre paréntesis y en cursiva para ver qué responde el bot.
 
@@ -106,36 +113,46 @@ Las consultas que hacen uso de Wikidata son:
 
 |Nombre | Descripción | Ejemplo|
 |------------------|-------------|--------------------|
-| | | |
-| | | |
-| | | |
-| | | |
-| | | |
-| | | |
-| | | |
-| | | |
+| `AutorDeObra` | Cuál es el autor de una obra | *¿Quién es el autor de El Grito?* |
+| `FechaObra` | En qué fecha (aproximada) se hizo una obra | *¿Cuándo se hizo El Guernica?* |
+| `GeneroObra` | A qué género o movimiento artístico pertenece una obra | *¿A qué movimiento pertenece La Última Cena?* |
+| `HechosSobreObra` | Qué eventos notables han sucedido en relación a la obra | *Háblame sobre La Mona Lisa* |
+| `LocalizacionObra` | Dónde está la obra | *¿Dónde está El Pensador?* |
+| `MedidasObra` | Cuánto mide la obra | *¿Cuánto mide Saturno devorando a sus hijos?* |
+| `ObraRelacionada` | Obras del mismo autor | *Dime obras relacionadas con La Joven de la Perla* |
+| `ObrasDeAutor` | Obras de un autor | *Dime obras de Jeff Koons* |
 
 Para Wikidata hacemos uso Pubnub, con el código que puede consultarse en el fichero adjunto `pubnub.js`.
+El sistema intenta reconocer sobre qué obra se pregunta y busca la información asociada en Wikidata, dando una respuesta descriptiva en relación a lo que pregunta el usuario en caso de obtener la información o una respuesta genérica cuando esta información no se encuentra disponible.
 
-El funcionamiento básico es el siguiente: cada intent de esta lista tiene una función asociada que realiza una consulta en Wikidata utilizando el lenguaje SPARQL. Si la consulta:
-
-- Tiene éxito, se devuelve una respuesta que contiene la información solicitada, ajustando en la medida de lo posible los artículos femeninos y masculinos al género de las personas mencionadas.
-- Falla una vez, se prueba de nuevo eliminando los artículos iniciales.
-- Falla dos veces, se devuelve un mensaje de error genérico asociado al intent.
-
-A continuación vemos un ejemplo de función que resuelve una consulta.
-
-
-
-
-### Funcionamiento de DialogFlow y Wikidata
-### Integración con DialogFlow
-
-TODO: 
+El funcionamiento se describe en la sección [Uso de Wikidata].
 
 ## Interfaz sensorial
 
+Para la práctica de la interfaz sensorial hemos implementado el uso de 4 sensores con los que se permite al usuario la interacción con funcionalidades extra del museo.
+Las siguientes 4 secciones resumen la utilidad que tiene en la aplicación cada uno de los sensores.
+
 ### Uso de vector de rotación
+
+El sensor de rotación (*rotation vector sensor*) permite al usuario interactuar con el visor 3D moviendo su dispositivo móvil para rotar una figura que representa una obra de arte.
+Puede accederse a esta actividad de la aplicación de dos formas
+
+1. Mediante el uso del botón de 3D, que proporciona un menú que da acceso a las figuras disponibles.
+2. Mediante el uso de comandos de voz del tipo *Enséñame el David de Miguel Ángel* que muestran la figura asociada si está disponible.
+
+Las figuras disponibles son:
+
+1. El Pensador de Rodin,
+2. La Venus de Willendorf,
+3. El David de Miguel Ángel,
+4. La Piedad del Vaticano y
+5. La Fuente de Duchamp
+
+Hemos escogido estas figuras como ejemplo de diversos tipos de arte y periodos históricos, aunque la aplicación sería fácilmente extensible con nuevas obras de arte.
+Para detalles sobre la obtención de las figuras puede consultarse la sección [Recursos externos utilizados].
+
+El sensor proporciona al usuario una forma sencilla y accesible de interactuar con los objetos y explorar las obras de arte, mejorando así su experiencia en el museo.
+
 ### Uso de sensor de proximidad
 ### Uso de códigos QR
 ### Uso de acelerómetro
@@ -162,6 +179,16 @@ Métodos en MainActivity:
 - setTextView
 - onResume
 - onPause
+
+## Uso de Wikidata
+
+El funcionamiento básico es el siguiente: cada intent de esta lista tiene una función asociada que realiza una consulta en Wikidata utilizando el lenguaje SPARQL. Si la consulta:
+
+- Tiene éxito, se devuelve una respuesta que contiene la información solicitada, ajustando en la medida de lo posible los artículos femeninos y masculinos al género de las personas mencionadas.
+- Falla una vez, se prueba de nuevo eliminando los artículos iniciales.
+- Falla dos veces, se devuelve un mensaje de error genérico asociado al intent.
+
+A continuación vemos un ejemplo de función que resuelve una consulta.
 
 ## Modelos 3D
 
@@ -258,4 +285,5 @@ Métodos en MainActivity:
 - randArtwork
 
 
-# Código externo utilizado
+# Recursos externos utilizados
+
