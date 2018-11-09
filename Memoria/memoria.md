@@ -154,8 +154,24 @@ Para detalles sobre la obtención de las figuras puede consultarse la sección [
 El sensor proporciona al usuario una forma sencilla y accesible de interactuar con los objetos y explorar las obras de arte, mejorando así su experiencia en el museo.
 
 ### Uso de sensor de proximidad
+
+El sensor de proximidad detiene la narración del bot en el caso de que se detecte un objeto próximo a la pantalla, de forma similar al funcionamiento de aplicaciones como WhatsApp o Telegram. De esta forma podemos detener al bot dándole la vuelta al móvil de tal manera que la pantalla repose sobre una superficie.
+
+La aplicación muestra un *Toast* informativo que explica este funcionamiento para que el usuario comprenda el funcionamiento.
+
 ### Uso de códigos QR
+
+La aplicación incluye el uso de sensores QR que permiten acceder a información de una obra mediante el uso de la cámara. De esta forma es sencillo interactuar con posibles recomendaciones de obras de arte del museo, que sólo tiene que añadir un código QR de una obra de arte en una pared.
+
+Para acceder a esta funcionalidad es necesario pulsar en el botón de QR. Este nos lleva a una actividad que detecta códigos QR y nos da información sobre la obra asociada. La interfaz también permite activar o desactivar la linterna para entornos de visibilidad limitada.
+
 ### Uso de acelerómetro
+
+Si el usuario no quiere preguntar sobre una obra concreta puede interactuar con la aplicación utilizando el sensor de acelerómetro para obtener información sobre una obra aleatoria como su nombre o localización. Simplemente necesita agitar su dispositivo y recibirá información sobre una obra aleatoria.
+
+Además, utilizando el botón de opciones puede ajustar el umbral de este sensor de tal manera que no tenga que agitar el dispositivo con mucha fuerza, ajustándose así a los distintos dispositivos y ofreciendo una opción accesible para interactuar con la aplicación si el usuario tiene movilidad reducida.
+
+\newpage
 
 # Documentación técnica
 
