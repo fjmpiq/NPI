@@ -29,7 +29,7 @@
             <!-- android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" -->
         </activity>
         <activity
-            android:name="conversandroid.DecoderActivity"
+            android:name="conversandroid.viewerqr.DecoderActivity"
             android:label="@string/app_name"
             android:parentActivityName="conversandroid.MainActivity"
             >

@@ -1,4 +1,4 @@
-package conversandroid;
+package conversandroid.viewerqr;
 
 
 import android.content.Context;

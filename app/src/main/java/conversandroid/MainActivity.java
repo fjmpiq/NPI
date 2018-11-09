@@ -72,6 +72,7 @@ import ai.api.model.Result;
 
 import conversandroid.talkback.R;
 import conversandroid.viewer3d.ModelActivity;
+import conversandroid.viewerqr.DecoderActivity;
 
 
 /**
