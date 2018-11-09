@@ -719,6 +719,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         if(event.sensor.getType()==Sensor.TYPE_PROXIMITY) {
             if(event.values[0]==0) {
                 stop();
+                sManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_NORMAL);
             }
         }
     }
