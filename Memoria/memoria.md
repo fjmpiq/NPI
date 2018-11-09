@@ -50,7 +50,7 @@ esta base de datos.
 
 # Funcionamiento de la aplicación
 
-## Interfaz básica y recursos comunes
+## Interfaz básica
 
 La interfaz principal de la aplicación consta de 4 botones y una región con texto.
 Los botones permiten acceder a distintas funcionalidades de la aplicación que también son accesibles mediante la interfaz oral. Los botones son:
@@ -77,7 +77,7 @@ Además se hace uso de *Toasts* para mostrar información opcional.
 La interfaz oral se ha implementado con un bot de DialogFlow, que combina respuestas fijas con consultas a la base de datos [Wikidata](https://www.wikidata.org/) para la obtención de información relativa a las obras de arte.
 También permite interactuar con otras partes de la aplicación como el visor 3D de forma oral, haciendo así más accesible la aplicación a personas con movilidad reducida.
 
-### Texto y voz
+### Sintetización y transcripción de voz
 
 TODO: No sé qué va aquí
 
@@ -140,11 +140,11 @@ TODO:
 ### Uso de códigos QR
 ### Uso de acelerómetro
 
-# Módulos
+# Documentación técnica
 
 *A continuación se han agrupado los atributos métodos y clases relacionadas con cada módulo. Habría que desarrollar cada uno.*
 
-## Interfaz y recursos comunes:
+## Interfaz y recursos comunes
 
 Atributos en MainActivity:
 
