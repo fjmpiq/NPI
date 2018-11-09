@@ -18,8 +18,35 @@ toc: true
 
 # Introducción e idea de museo
 
-TODO 
-*Musemium*
+***Musemium***
+
+La Mona Lisa está en el Louvre, las meninas en el Museo del Prado, los
+girasoles de Vincent van Gogh en la National Gallery de Londres, El
+Grito en Oslo. Pero no todo el arte del mundo está en Europa, La
+persistencia del tiempo está en el Museo de Arte Moderno de Nueva
+York, si queremos ver la mayor parte de la obra de Frida Khalo
+tendríamos que desplazarnos hasta México. Y en Asia, África y Oceanía
+podemos perder la cuenta con las obras que reflejan sus culturas.
+
+Si quisiéramos contemplar una mínima parte todas estas obras
+necesitaríamos años y un presupuesto desmesurado para viajar y ver
+todo lo que nos hayamos propuesto.
+
+¿Y si pudieramos reunir todas esas obras, y la información sobre ellas
+en un único lugar?
+
+Nuestra propuesta es justo esa. Desprendernos de la idea arquetípica
+de museo. Tan solo necesitamos: Una pantalla, un teléfono y acceso a
+internet. 
+
+Con esto podemos preguntar sobre cualquier obra o autor de la que se
+disponga información en nuestro museo. Y nuestra colección tiene
+truco, es el fruto del poder de la comunidad y la
+colaboración. Sólamente está limitada por la información en español
+que podemos encontrar en [wikidata](https://www.wikidata.org/), por lo
+cual la colección del museo seguirá creciendo sin que tengamos que
+hacer nada. Además, tú puedes formar parte del museo colaborando con
+esta base de datos.
 
 # Funcionamiento de la aplicación
 
