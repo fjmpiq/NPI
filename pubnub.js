@@ -28,6 +28,7 @@ export default (request, response) => {
     intentMap.set('ObrasEnMuseo', obrasEnMuseo);
     intentMap.set('ObrasDeMovimiento', obrasDeMovimiento);
     intentMap.set('BiografiaAutor', biografiaAutor);
+    intentMap.set('InfoSobreObra', infoSobreObra);
     
     // Mapa de las respuestas que da cuando falla en la consulta
     let failed = new Map();
@@ -42,7 +43,8 @@ export default (request, response) => {
     failed.set('QuienEsAutor', "Lo siento, no conozco a ese autor o autora...");
     failed.set('ObrasEnMuseo', "Lo siento, no conozco obras de ese museo...");
     failed.set('ObrasDeMovimiento', "Lo siento, no conozco obras de ese movimiento...");
-    failed.set('BiografiaAutor', "Lo siento, no esa información sobre ese autor o autora...");
+    failed.set('BiografiaAutor', "Lo siento, no conozco esa información sobre ese autor o autora...");
+    failed.set('InfoSobreObra', "Lo siento, no conozco nada interesante sobre esa obra...");
     
     function tryAgain(){
         tries += 1;
@@ -490,6 +492,42 @@ export default (request, response) => {
                 else
                     endOfSentence = ".";
                 return results[0].itemLabel.value + " nació en " + results[0].birthPlaceLabel.value + " en " + results[0].birthDateLabel.value.substring(0,4) + endOfSentence;
+            }
+        });
+    }
+    
+    // Función que gestiona el intent InfoSobreObra
+    function infoSobreObra(){
+        const endpointUrl = 'https://query.wikidata.org/sparql',
+        sparqlQuery = `
+        SELECT ?itemLabel ?creatorLabel ?creatorDescription ?inception ?locLabel ?countryLabel ?height ?width WHERE {
+            SERVICE wikibase:mwapi {
+                bd:serviceParam wikibase:api "EntitySearch" .
+                bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+                bd:serviceParam mwapi:search "${any}" .
+                bd:serviceParam mwapi:language "es" .
+                ?item wikibase:apiOutputItem mwapi:item .
+            }
+            SERVICE wikibase:label {
+                bd:serviceParam wikibase:language "es,en" .
+            }
+            ?item (wdt:P279|wdt:P31) ?type.
+            VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
+            ?item wdt:P170 ?creator.
+            ?item wdt:P571 ?inception.
+            ?item wdt:P17 ?country.
+            ?item wdt:P276 ?loc.
+            ?item wdt:P2048 ?height.
+            ?item wdt:P2049 ?width.
+        } LIMIT 10`,
+        fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery ),
+        headers = { 'Accept': 'application/sparql-results+json' };
+        return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
+            const results = json.results.bindings;
+            if (results.length === 0)
+                return tryAgain();
+            else{
+                return results[0].itemLabel.value + " es una obra de " + results[0].creatorLabel.value + " que data del " + results[0].inception.value.substring(0,4) + ". Se encuentra en " + results[0].locLabel.value + ", " + results[0].countryLabel.value + ". Mide " + results[0].width.value + " centímetros de ancho y " + results[0].height.value + " centímetros de alto.";
             }
         });
     }

@@ -238,7 +238,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
         if(requestCode == SCAN_REQUEST && resultCode == Activity.RESULT_OK) {
             scannedCode = data.getStringExtra("scannedCode");
-            sendMsgToChatBot("quién pintó " + scannedCode);
+            sendMsgToChatBot("háblame sobre " + scannedCode);
         }
     }
 
