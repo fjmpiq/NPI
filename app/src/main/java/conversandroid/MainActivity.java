@@ -85,47 +85,73 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     // ATTRIBUTES                                                            //
     ///////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Debugging Activity tag
+     */
     private static final String LOGTAG = "CLEEPY";
+
     private static final Integer ID_PROMPT_QUERY = 0;
     private static final Integer ID_PROMPT_INFO = 1;
-    private static final int SETTINGS_REQUEST = 2;
-    private static final int SCAN_REQUEST = 3;
-    // Access to textView
+
+
+    /**
+     * Access to the main TextView
+     */
     private TextView queryResultTextView;
 
 
     // VOICE AND TEXT
+    /**
+     * Time at which the app started listening last time
+     */
     private long startListeningTime = 0; // To skip errors (see processAsrError method)
 
-    // Control of the initial prompt
-    boolean initialPromptDone = false;
+    /**
+     * Control of the initial prompt
+     */
+    private boolean initialPromptDone = false;
 
 
     // DIALOGFLOW INTEGRATION
 
-    //Connection to DialogFlow
+    /**
+     * Connection to DialogFlow
+     */
     private AIDataService aiDataService=null;
     // https://dialogflow.com/docs/reference/agent/#obtaining_access_tokens)
 
-    // SENSORS
+
+    /**
+     * Sensor manager and sensor objects for proximity and acceleration
+     */
     SensorManager sManager;
     Sensor proximitySensor;
     Sensor accelSensor;
 
-    // Accelerations for shake detection
+    // RANDOM ARTWORKS
+
+    /**
+     * OptionsActivity request id
+     */
+    private static final int SETTINGS_REQUEST = 2;
+
+    /**
+     * Accelerations for shake detection
+     */
     private float mAccel; // acceleration apart from gravity
     private float mAccelCurrent; // current acceleration including gravity
     private float mAccelLast; // last acceleration including gravity
-    private int accelThreshold = 12; // acceleration
+    private int accelThreshold = 12; // acceleration threshold
 
-    // RANDOM ARTWORKS
-
-    // JSON object with random artworks
-    private JSONArray artworks;
+    private JSONArray artworks; // JSON object with random artworks
 
     // CAMERA INTEGRATION
+
+    /**
+     * DecoderActivity request id
+     */
+    private static final int SCAN_REQUEST = 3;
     private final int MY_PERMISSIONS_CAMERA = 23; // Const to request permission
-    String scannedCode = "";
 
     ///////////////////////////////////////////////////////////////////////////
     // METHODS                                                               //
@@ -150,11 +176,8 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         //Initialize the speech recognizer and synthesizer
         initSpeechInputOutput(this);
 
-        //Set up the speech button
-        setSpeakButton();
-
-        // Set up the 3D, settings and qr buttons
-        setExtraButtons();
+        // Set up the buttons
+        setButtons();
 
         //Dialogflow configuration parameters
         String ACCESS_TOKEN = "c9d250a9a574465cacf77f7117c472f4 ";
@@ -208,7 +231,11 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     /**
      *   Assigns listeners to buttons
      */
-    private void setExtraButtons() {
+    private void setButtons() {
+        // Speaking button
+        Button speak = findViewById(R.id.speech_btn);
+        speak.setOnClickListener(this::onClick);
+
         // 3D Button
         Button b3D = findViewById(R.id.launch3d_btn);
         b3D.setOnClickListener(v -> loadModelFromAssets());
@@ -237,7 +264,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         }
 
         if(requestCode == SCAN_REQUEST && resultCode == Activity.RESULT_OK) {
-            scannedCode = data.getStringExtra("scannedCode");
+            String scannedCode = data.getStringExtra("scannedCode");
             sendMsgToChatBot("háblame sobre " + scannedCode);
         }
     }
@@ -250,17 +277,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         queryResultTextView = findViewById(R.id.queryResult);
         queryResultTextView.setText(R.string.initial_textView_message);
 
-    }
-
-    /**
-     *   Assigns startListening method to the button, if it's the first time it's pressed
-     *   it will display the prompt message
-     */
-    private void setSpeakButton() {
-        // gain reference to speak button
-        Button speak = findViewById(R.id.speech_btn);
-
-        speak.setOnClickListener(this::onClick);
     }
 
 
@@ -314,7 +330,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     private void qrScan() {
         if(checkScanPermissions()){
             Intent intent = new Intent(getApplicationContext(), DecoderActivity.class);
-            intent.putExtra("scannedCode", scannedCode);
             startActivityForResult(intent,SCAN_REQUEST);
         }
 
@@ -337,6 +352,35 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
             return true;
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode,permissions,grantResults);
+
+        if(requestCode == MY_PERMISSIONS_CAMERA){
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.i(LOGTAG, "Camera permission granted");
+            } else {
+                Log.i(LOGTAG, "Camera permission denied");
+                onCameraPermissionDenied();
+            }
+        }
+    }
+
+    /**
+     * Shows message if camera permission is denied
+     */
+    private void onCameraPermissionDenied() {
+        if(!isTTSSpeaking()) {
+            try {
+                speak(getResources().getString(R.string.camera_permissions_denied), "ES", ID_PROMPT_QUERY);
+
+            } catch (Exception e) {
+                Log.e(LOGTAG, "TTS not accessible");
+            }
+        }
+    }
+
 
 
     // VOICE AND TEXT
@@ -568,34 +612,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         Log.d(LOGTAG, "TTS starts speaking");
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode,permissions,grantResults);
-
-        if(requestCode == MY_PERMISSIONS_CAMERA){
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.i(LOGTAG, "Camera permission granted");
-            } else {
-                Log.i(LOGTAG, "Camera permission denied");
-                onCameraPermissionDenied();
-            }
-        }
-    }
-
-    /**
-     * Shows message if camera permission is denied
-     */
-    private void onCameraPermissionDenied() {
-        if(!isTTSSpeaking()) {
-            try {
-                speak(getResources().getString(R.string.camera_permissions_denied), "ES", ID_PROMPT_QUERY);
-
-            } catch (Exception e) {
-                Log.e(LOGTAG, "TTS not accessible");
-            }
-        }
-    }
-
     /**
      * Manages action of main button on click
      */
@@ -708,7 +724,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
 
     /**
-     * Method necessary to implement SensorEventListener interface
+     * Empty method necessary to implement SensorEventListener interface
      */
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }

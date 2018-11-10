@@ -175,32 +175,86 @@ Además, utilizando el botón de opciones puede ajustar el umbral de este sensor
 
 # Documentación técnica
 
-*A continuación se han agrupado los atributos métodos y clases relacionadas con cada módulo. Habría que desarrollar cada uno.*
+A continuación describimos de forma breve la implementación de la funcionalidad de la aplicación.
+Cada atributo y método que hemos implementado tiene además su documentación en forma de Javadoc dentro del propio código.
 
 ## Interfaz y recursos comunes
 
-Atributos en MainActivity:
+`MainActivity` es la actividad principal de la aplicación.
+Es una subclase de `VoiceActivity` (TODO: descripción) e implementa la interfaz `SensorEventListener` para poder gestionar los sensores.
 
-- LOGTAG
-- ID_PROMPT_QUERY
-- ID_PROMPT_INFO
-- queryResultTextView
+Atributos generales en MainActivity:
+
+- `LOGTAG`: Etiqueta de la actividad para mensajes de depuración
+- `queryResultTextView`: Vista principal de texto. 
 
 Métodos en MainActivity:
 
-- onCreate
-- setSpeakButton
-- set3DButton
-- setQRbutton
-- setTextView
-- onResume
-- onPause
+- `onCreate`: Inicializa la interfaz visual, de voz y los sensores
+- `setSpeakButton`: Configura el botón de habla
+- `setExtraButtons`: Configura los botones extra (botón QR, botón 3D y botón de opciones)
+- `setTextView`: Establece el texto inicial de la vista principal de texto
+- `onResume`: Registra los sensores
+- `onPause`: Elimina los sensores
+- `onActivityResult`: Gestiona la información devuelta por las actividades de opciones y escaneo QR
 
-## Uso de Wikidata
+## Interfaz de voz
+### Texto y voz
+
+Atributos en MainActivity:
+
+- `ID_PROMPT_QUERY` e `ID_PROMPT_INFO`: TODO
+- `startListeningTime`: Indica el tiempo en el que se empezó a escuchar por última vez para procesado de errores.
+- `initialPromptDone`: Indica si el mensaje inicial debe ser reproducido (`false`) o no (`true`).
+
+Métodos en MainActivity:
+
+- `showRecordPermissionExplanation`: indica que necesita el micrófono
+- `onRecordAudioPermissionDenied`: Indica que no puede funcionar sin micrófono
+- `startListening`: comienza a escuchar al usuario
+- `processAsrReadyForSpeech` y `changeButtonAppearanceToListening`: Cambia la apariencia del botón para indicar que está escuchando
+- `changeButtonAppearanceToDefault`: Cambia apariencia al botón por defecto
+- `processAsrError`: Procesa error al escuchar
+- `processAsrResults`: Toma el mejor resultado escuchado y lo manda al chatbot
+- `deviceConnectedToInternet`: Comprueba si el dispositivo está conectado a Internet
+- `onDestroy`: Desactiva el motor de voz
+- `onTTSDone`: Registra el sensor de aceleración 
+- `onTTSError`: Indica por log que ha habido un error.
+- `onTTSStart`: Indica por log que empieza a hablar
+- `onClick`: Gestiona el comportamiento del botón de habla (mensaje inicial o escucha)
+
+Clases relacionadas:
+
+- `VoiceActivity`: TODO
+
+### Integración con DialogFlow
+
+Atributos en MainActivity:
+
+- `aiDataService`: Conexión al servicio de DialogFlow.
+
+Métodos en MainActivity:
+
+- `sendMsgToChatBot`: envía mensaje escuchado al bot.
+
+Clases en MainActivity:
+
+- `MyAsyncTaskClass`: Clase que se encarga de enviar la petición a DialogFlow de forma asíncrona.
+
+TODO: Hablar de la clase MyAsyncTaskClass.
+
+### Uso de Wikidata (Pubnub)
+
+Para la resolución de algunas de las consultas hacemos uso de Wikidata, una base de datos apoyada en Wikipedia que nos permite obtener información sobre las obras de arte del museo. 
+El código está alojado en Pubnub y lo adjuntamos en el fichero `pubnub.js`.
+
+Wikidata es una base de datos basada en tripletas Propiedad - Relación - Objeto.
+Para obtener información sobre las obras de arte hacemos uso de las propiedades adecuadas.
+A continuación hay una lista de propiedades de ejemplo que utilizamos en las consultas:
 
 | Nombre             | Descripción                     | Id    | Ejemplos                                     |
 |--------------------+---------------------------------+-------+----------------------------------------------|
-| instance of        | Qué tipo de cosa es             | P31   | painting, sculpture, group of paintings      |
+| instance of        | Qué tipo de cosa es             | P31   | painting, sculpture, human                   |
 | image              | Imagen de la obra               | P18   | Archivo .jpg                                 |
 | inception          | Fecha de creación               | P571  | 1893, 1500s. Puede ser un periodo            |
 | movement           | Movimiento artístico            | P135  | Alto Renacimiento, Cubismo                   |
@@ -208,21 +262,118 @@ Métodos en MainActivity:
 | described at URL   | descrita en la web              | P973  | URL donde se describe                        |
 | country of origin  | País de origen                  | P495  | Italia                                       |
 | significant event  | Lista de eventos significativos | P793  | Descubrimiento, robo (con fecha)             |
-| material used      | Lista de materiales utilizados  | P186  | óleo, madera, bronce, témpera                |
-| 3D Model           | Modelo 3D                       | P4896 | Archivo .stl                                 |
-| depicts            | Lista de cosas que representa   | P180  | cielo, paisaje, hombre (con características) |
-| fabrication method | Técnica utilizada               | P2079 | fresco                                       |
 | notable work       | Obras notables                  | P800  | Mona Lisa                                    |
 
-El funcionamiento básico es el siguiente: cada intent de esta lista tiene una función asociada que realiza una consulta en Wikidata utilizando el lenguaje SPARQL. Si la consulta:
+Cada propiedad tiene un identificador que en la tabla aparece en la columa "Id".
+Para obtener información de la base de datos hacemos consultas en el lenguaje [SPARQL](https://www.w3.org/TR/rdf-sparql-query/), un lenguaje para bases de datos de tripletas.
 
-- Tiene éxito, se devuelve una respuesta que contiene la información solicitada, ajustando en la medida de lo posible los artículos femeninos y masculinos al género de las personas mencionadas.
-- Falla una vez, se prueba de nuevo eliminando los artículos iniciales.
-- Falla dos veces, se devuelve un mensaje de error genérico asociado al intent.
+El funcionamiento básico de la interacción con Wikidata por parte de DialogFlow es el siguiente: cada intent que usa Wikidata tiene una función asociada que realiza una consulta utilizando el lenguaje SPARQL. Si la consulta:
 
-A continuación vemos un ejemplo de función que resuelve una consulta.
+- tiene éxito, se devuelve una respuesta que contiene la información solicitada, ajustando en la medida de lo posible los artículos femeninos y masculinos al género de las personas mencionadas.
+- falla una vez, se prueba de nuevo eliminando los artículos iniciales.
+- falla dos veces, se devuelve un mensaje de error genérico asociado al intent.
 
-## Modelos 3D
+A continuación vemos un ejemplo de función que resuelve una consulta de `AutorDeObra` 
+(*¿Quién es el autor de La Mona Lisa?*).
+
+En primer lugar discutimos la consulta de SPARQL que utilizamos para este intent (ligeramente simplificada para facilitar la explicación).
+SPARQL tiene una sintaxis declarativa similar a la de SQL y permite el uso de servicios.
+Las consultas pueden probarse en `query.wikidata.org`.
+En concreto a partir de [este enlace](https://query.wikidata.org/#SELECT%20%3FitemLabel%20%3FcreatorLabel%20%3FcreatorDescription%20%3FgenderLabel%20WHERE%20%7B%0A%20%20SERVICE%20wikibase%3Amwapi%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Aapi%20%22EntitySearch%22%20.%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Aendpoint%20%22www.wikidata.org%22%20.%0A%20%20%20%20bd%3AserviceParam%20mwapi%3Asearch%20%22Mona%20Lisa%22%20.%0A%20%20%20%20bd%3AserviceParam%20mwapi%3Alanguage%20%22es%22%20.%0A%20%20%20%20%3Fitem%20wikibase%3AapiOutputItem%20mwapi%3Aitem%20.%0A%20%20%7D%0A%20%20%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%0A%20%20%20%20bd%3AserviceParam%20wikibase%3Alanguage%20%22es%2Cen%22%20.%0A%20%20%7D%0A%20%20%0A%20%20%3Fitem%20%28wdt%3AP279%7Cwdt%3AP31%29%20%3Ftype.%0A%20%20VALUES%20%3Ftype%20%7Bwd%3AQ3305213%20wd%3AQ18573970%20wd%3AQ219423%20wd%3AQ179700%7D%0A%20%20%3Fitem%20wdt%3AP170%20%3Fcreator.%0A%20%20%3Fcreator%20wdt%3AP21%20%3Fgender.%0A%7D%20LIMIT%2010) puede comprobarse la respuesta que da Wikidata a nuestra consulta.
+
+El código completo de la consulta es:
+```sql
+SELECT ?itemLabel ?creatorLabel ?creatorDescription ?genderLabel WHERE {
+  SERVICE wikibase:mwapi {
+    bd:serviceParam wikibase:api "EntitySearch" .
+    bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+    bd:serviceParam mwapi:search "${any}" .
+    bd:serviceParam mwapi:language "es" .
+    ?item wikibase:apiOutputItem mwapi:item .
+  }
+  
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "es" .
+  }
+  
+  ?item wdt:P31 ?type.
+  VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
+  ?item wdt:P170 ?creator.
+  ?creator wdt:P21 ?gender.
+} LIMIT 10
+```
+
+Explicamos a continuación las distintas partes de la consulta.
+La primera línea, `SELECT` nos indica con qué variables queremos quedarnos. En este caso son:
+
+`?itemLabel`
+: Nombre de la obra. Utilizamos este nombre para corregir posibles erratas en la entrada de DialogFlow
+
+`?creatorLabel`
+: Nombre de la persona que creó la obra
+
+`?creatorDescription`
+: Descripción de la persona que creó la obra
+
+`?genderLabel`
+: Género de la persona que creo la obra
+
+A continuación, los bloques `SERVICE` indican el uso de servicios externos.
+Para todas las consultas hacemos uso de dos servicios:
+
+1. El servicio de búsqueda de MediaWiki (`SERVICE wikibase:mwapi`), que nos permite buscar a partir de la entrada del usuario entre las entidades de Wikidata. Lo hace a partir del valor `${any}` obtenido por DialogFlow como una entidad `any` en la consulta y
+2. El servicio de etiquetas de Wikidata (`SERVICE wikibase:label`), que nos permite darle nombre y descripción a las entidades encontradas.
+   Usando este servicio, si tenemos una entidad `?A`, las variables `?ALabel` y `?ADescription` contienen su 
+   nombre y descripción respectivamente.
+
+Por último tenemos el cuerpo de la función. 
+Utilizamos un bloque de tipo `VALUES` y la sintaxis básica de SPARQL, que nos permite razonar sobre las tripletas.
+Una sentencia básica es de la forma `A prop B.` que se lee *"`A` tiene valor `B` en la propiedad `prop`"*.
+
+Las sentencias del cuerpo de la request tienen el siguiente significado:
+
+1. `?item wdt:P31 ?type.` `?item` (el resultado de la búsqueda con el nombre que ha dado el usuario) es una instancia de (`wdt:P31`) `?type`.
+2. `VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}`. `?type` es un valor de la siguiente lista: *pintura* (`Q3305213`), *grupo de pinturas* (`Q18573970`), *mural* (`Q219423`) o *estatua* (`Q179700`). De esta forma restringimos la búsqueda a obras de arte.
+3. `?item wdt:P170 ?creator.`. `?item` tiene como creador (`wdt:P170`) a `?creator`.
+4. `?creator wdt:P21 ?gender.` `?creator` tiene como género (`wdt:P21`) a `?gender`.
+
+De esta forma la consulta nos devuelve obras de arte (esto es, pinturas, grupos de pinturas, murales o estatuas) que coincidan con la consulta del usuario y nos proporciona además su creador y una descripción del mismo.
+La última línea limita el número de resultados a 10.
+   
+A continuación explicamos brevemente el código en Javascript implementado en Pubnub.
+La variable `sparqlQuery` contiene la consulta a la base de datos de Wikidata que acabamos de mostrar.
+
+```javascript
+function autorDeObra(){
+  const endpointUrl = 'https://query.wikidata.org/sparql',
+  sparqlQuery = `...`,
+  fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery ),
+  headers = { 'Accept': 'application/sparql-results+json' };
+  
+)  return xhr.fetch(fullUrl, { headers } )
+  .then( body => body.json() )
+  .then( json => {
+    const results = json.results.bindings;
+    if (results.length === 0)
+      return tryAgain();
+    else
+      return autorAutora(results[0].genderLabel.value) + 
+      " de " + results[0].itemLabel.value + 
+      " es " + results[0].creatorLabel.value + 
+      ", " + results[0].creatorDescription.value + ".";
+  });
+}
+```
+
+La función hace una petición a partir del objeto `xhr` de Pubnub (con una API idéntica a [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)) con la consulta adecuada. A continuación procesa la respuesta como un objeto JSON. Si no consigue resultados, prueba de nuevo (`tryAgain`) con nombres similares. Si no los consiguiera de nuevo devolvería una respuesta genérica a ese intent.
+
+Si los consigue toma el nombre del item `itemLabel`, el nombre del autor `creatorLabel`, la descripción del autor `creatorDescription` y el género del autor `genderLabel` para utilizar los pronombres adecuados.
+Esta respuesta se envía a DialogFlow que la envía de vuelta a la aplicación.
+
+La implementación de funciones del resto de intents es muy similar, cambiando sólo la información a la que accedemos.
+
+## Interfaz de sensores
+### Modelos 3D
 
 Atributos en MainActivity:
 
@@ -239,83 +390,37 @@ Clases relacionadas:
 - ModelSurfaceView
 - ModelRenderer
 
-## Texto y voz
-
-Atributos en MainActivity:
-
-- startListeningTime
-- initialPromptDone
-
+### Sensor QR
 
 Métodos en MainActivity:
 
-- showRecordPermissionExplanation
-- onRecordAudioPermissionDenied
-- startListening
-- processAsrReadyForSpeech
-- changeButtonAppearanceToListening
-- changeButtonAppearanceToDefault
-- processAsrError
-- processAsrResults
-- deviceConnectedToInternet
-- onDestroy
-- onTTSDone
-- onTTSError
-- onTTSStart
-- onClick
+- `qrScan`: Inicializa actividad de escaneo
+- `checkScanPermissions`: Comprueba si hay permisos para la cámara.
+- `onRequestPermissionResult` y `onCameraPermissionDenied`: Explica al usuario la necesidad de dar permiso para la cámara
+- ver también [Interfaz y recursos comunes] para funciones que comparte con otras partes de la interfaz
 
-Clases relacionadas:
+También se hace uso de `DecoderActivity`, que es un recurso externo. 
+En esta actividad hemos traducido la interfaz y eliminado algunas características innecesarias para nuestra aplicación. TODO: Algo más?
 
-- VoiceActivity
-
-## Integración con DialogFlow
+### Sensores de proximidad y agitación
 
 Atributos en MainActivity:
 
-- aiDataService
+- `sManager`: Gestor de sensores
+- `proximitySensor`: Sensor de proximidad
+- `accelSensor`: Sensor de aceleración
+- `mAccel`: Aceleración actual ajustada por la gravedad
+- `mAccelCurrent`: Aceleración actual sin ajustar
+- `mAccelLast`: Última aceleración sin ajustar
+- `artworks`: objeto JSON que guarda las obras para sugerir obras aleatorias
 
 Métodos en MainActivity:
 
-- sendMsgToChatBot
-
-Clases en MainActivity:
-
-- MyAsyncTaskClass
-
-Hablar de la clase MyAsyncTaskClass.
-
-## Sensores de proximidad y agitación
-
-Atributos en MainActivity:
-
-- sManager
-- proximitySensor
-- accelSensor
-- mAccel
-- mAccelCurrent
-- mAccelLast
-
-Métodos en MainActivity:
-
-- setUpSensors
-- onAccuracyChanged
-- onSensorChanged
-- onShake
-
-Clases relacionadas:
-
-- SensorEventListener
-
-## Obras aleatorias
-
-Atributos en MainActivity:
-
-- artworks
-
-Métodos en MainActivity:
-
-- randArtwork
-
+- `setUpSensors`: Configura sensores
+- `onAccuracyChanged`: Método vacío necesario para implementar la interfaz de escucha de sensores
+- `onSensorChanged`: Gestiona cambios de sensores de aceleración y proximidad.
+- `onShake`: Reproduce mensaje de obra aleatoria al agitar.
+- `randArtwork`: Genera información sobre obra aleatoria.
 
 # Recursos externos utilizados
 
