@@ -5,7 +5,7 @@
 
     <!-- Texts -->
     <string name="speechbtn_default">Pulsa para hablar</string>
-    <string name="speechbtn_listening">Escuchando...</string>
+    <string name="speechbtn_listening">Escuchando…</string>
     <string name="initial_prompt">¡Bienvenido al museo! Pulsa de nuevo para hacer una pregunta sobre la colección y los artistas.</string>
 
     <string name="question_repeater_default">Escucha tu pregunta</string>

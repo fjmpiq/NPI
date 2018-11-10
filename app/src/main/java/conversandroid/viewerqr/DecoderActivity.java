@@ -32,7 +32,6 @@ public class DecoderActivity extends AppCompatActivity
     private TextView resultTextView;
     private QRCodeReaderView qrCodeReaderView;
     private CheckBox flashlightCheckBox;
-    //private CheckBox enableDecodingCheckBox;
     private PointsOverlayView pointsOverlayView;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
@@ -135,9 +134,5 @@ public class DecoderActivity extends AppCompatActivity
         //    }
         //});
         qrCodeReaderView.startCamera();
-    }
-
-    private void onClick() {
-        Log.e("i","Pulsaboton");
     }
 }

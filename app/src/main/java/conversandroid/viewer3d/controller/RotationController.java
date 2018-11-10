@@ -11,6 +11,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.opengl.Matrix;
 
+/**
+ * @author @mx_psi, @fjmpiq, @jojelupipa
+ * Implements the rotation controller
+ */
 public class RotationController implements SensorEventListener{
 
 	private static final String TAG = RotationController.class.getName();

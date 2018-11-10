@@ -39,6 +39,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,9 +56,7 @@ import org.json.JSONException;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
 
 //Check the dependencies necessary to make these imports in
@@ -89,22 +88,13 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     private static final String LOGTAG = "CLEEPY";
     private static final Integer ID_PROMPT_QUERY = 0;
     private static final Integer ID_PROMPT_INFO = 1;
-    private static final int SETTINGS_REQUEST = 0;
-    private static final int SCAN_REQUEST = 1;
+    private static final int SETTINGS_REQUEST = 2;
+    private static final int SCAN_REQUEST = 3;
     // Access to textView
     private TextView queryResultTextView;
 
 
-    // 3D MODELS
-
-
-    // Parameters for 3D models
-    private Map<String, Object> loadModelParameters = new HashMap<>();
-
-
     // VOICE AND TEXT
-
-
     private long startListeningTime = 0; // To skip errors (see processAsrError method)
 
     // Control of the initial prompt
@@ -113,16 +103,11 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     // DIALOGFLOW INTEGRATION
 
-
     //Connection to DialogFlow
     private AIDataService aiDataService=null;
     // https://dialogflow.com/docs/reference/agent/#obtaining_access_tokens)
 
-
-
     // SENSORS
-
-
     SensorManager sManager;
     Sensor proximitySensor;
     Sensor accelSensor;
@@ -135,18 +120,20 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     // RANDOM ARTWORKS
 
-
     // JSON object with random artworks
     private JSONArray artworks;
 
     // CAMERA INTEGRATION
     private final int MY_PERMISSIONS_CAMERA = 23; // Const to request permission
-    String scannedCode = new String();
+    String scannedCode = "";
 
     ///////////////////////////////////////////////////////////////////////////
     // METHODS                                                               //
     ///////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Initializes UI
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -168,7 +155,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
         // Set up the 3D, settings and qr buttons
         setExtraButtons();
-
 
         //Dialogflow configuration parameters
         String ACCESS_TOKEN = "c9d250a9a574465cacf77f7117c472f4 ";
@@ -220,15 +206,18 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     }
 
     /**
-     *   Asigns listeners to buttons
+     *   Assigns listeners to buttons
      */
     private void setExtraButtons() {
+        // 3D Button
         Button b3D = findViewById(R.id.launch3d_btn);
         b3D.setOnClickListener(v -> loadModelFromAssets());
 
+        // QR Button
         Button qr_button = findViewById(R.id.qr_scanner);
         qr_button.setOnClickListener(v->qrScan());
 
+        // Options Button
         Button options_button = findViewById(R.id.options_button);
         options_button.setOnClickListener(v ->{
             Intent intent = new Intent(getApplicationContext(), OptionsActivity.class);
@@ -237,6 +226,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         });
     }
 
+    /**
+     * Manages information from activity results (Settings Activity and QR Activity)
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == SETTINGS_REQUEST && resultCode == Activity.RESULT_OK) {
@@ -254,7 +246,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     /**
      * Initializes the text view that will show the answer of the query
      */
-
     private void setTextView() {
         queryResultTextView = findViewById(R.id.queryResult);
         queryResultTextView.setText(R.string.initial_textView_message);
@@ -262,7 +253,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     }
 
     /**
-     *   Asigns startListening method to the button, if it's the first time it's pressed
+     *   Assigns startListening method to the button, if it's the first time it's pressed
      *   it will display the prompt message
      */
     private void setSpeakButton() {
@@ -273,12 +264,19 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     }
 
 
+    /**
+     * Sets up sensors on Activity's resume
+     */
     protected void onResume() {
         super.onResume();
         sManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
         sManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
+
+    /**
+     * Unregisters sensors on Activity's pause
+     */
     protected void onPause() {
         super.onPause();
         sManager.unregisterListener(this);
@@ -286,7 +284,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
 
     // 3D MODELS
-
 
     private void loadModelFromAssets() {
         AssetUtils.createChooserDialog(this, "Elige el modelo", null, "models", "(?i).*\\.(obj|stl|dae)",
@@ -311,6 +308,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     // QR SCANNING
 
+    /**
+     * Starts QR scanning activity
+     */
     private void qrScan() {
         if(checkScanPermissions()){
             Intent intent = new Intent(getApplicationContext(), DecoderActivity.class);
@@ -320,6 +320,10 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     }
 
+    /**
+     * Checks if app has proper permission to use QR scanner
+     * @return Whether we had permission to use the camera
+     */
     private boolean checkScanPermissions(){
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
@@ -578,6 +582,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         }
     }
 
+    /**
+     * Shows message if camera permission is denied
+     */
     private void onCameraPermissionDenied() {
         if(!isTTSSpeaking()) {
             try {
@@ -589,8 +596,10 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         }
     }
 
+    /**
+     * Manages action of main button on click
+     */
     private void onClick(View v) {
-
         if (!initialPromptDone) {
             try {
                 speak(getResources().getString(R.string.initial_prompt), "ES", ID_PROMPT_QUERY);
@@ -608,7 +617,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
 
     // DIALOGFLOW INTEGRATION
-
 
     private class MyAsyncTaskClass extends AsyncTask<String,Void,AIResponse>{
         /**
@@ -699,9 +707,16 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     }
 
 
+    /**
+     * Method necessary to implement SensorEventListener interface
+     */
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
+    /**
+     * Reacts to new sensor measurement
+     * @param event The sensor events (either from the accelerometer or the proximity sensor)
+     */
     public void onSensorChanged(SensorEvent event) {
         float x = event.values[0];
         float y = event.values[1];
@@ -718,10 +733,15 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         }
 
         if(event.sensor.getType()==Sensor.TYPE_PROXIMITY) {
-            if(event.values[0]==0) {
+            WindowManager.LayoutParams params = getWindow().getAttributes();
+            if(event.values[0]==0 && isTTSSpeaking()) {
+                params.screenBrightness = 0;
                 stop();
                 sManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            } else{
+                params.screenBrightness = -1;
             }
+            getWindow().setAttributes(params);
         }
     }
 

@@ -198,6 +198,22 @@ Métodos en MainActivity:
 
 ## Uso de Wikidata
 
+| Nombre             | Descripción                     | Id    | Ejemplos                                     |
+|--------------------+---------------------------------+-------+----------------------------------------------|
+| instance of        | Qué tipo de cosa es             | P31   | painting, sculpture, group of paintings      |
+| image              | Imagen de la obra               | P18   | Archivo .jpg                                 |
+| inception          | Fecha de creación               | P571  | 1893, 1500s. Puede ser un periodo            |
+| movement           | Movimiento artístico            | P135  | Alto Renacimiento, Cubismo                   |
+| creator            | Creador                         | P175  | Leonardo Da Vinci                            |
+| described at URL   | descrita en la web              | P973  | URL donde se describe                        |
+| country of origin  | País de origen                  | P495  | Italia                                       |
+| significant event  | Lista de eventos significativos | P793  | Descubrimiento, robo (con fecha)             |
+| material used      | Lista de materiales utilizados  | P186  | óleo, madera, bronce, témpera                |
+| 3D Model           | Modelo 3D                       | P4896 | Archivo .stl                                 |
+| depicts            | Lista de cosas que representa   | P180  | cielo, paisaje, hombre (con características) |
+| fabrication method | Técnica utilizada               | P2079 | fresco                                       |
+| notable work       | Obras notables                  | P800  | Mona Lisa                                    |
+
 El funcionamiento básico es el siguiente: cada intent de esta lista tiene una función asociada que realiza una consulta en Wikidata utilizando el lenguaje SPARQL. Si la consulta:
 
 - Tiene éxito, se devuelve una respuesta que contiene la información solicitada, ajustando en la medida de lo posible los artículos femeninos y masculinos al género de las personas mencionadas.
