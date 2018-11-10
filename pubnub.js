@@ -82,7 +82,7 @@ export default (request, response) => {
                 ?item wikibase:apiOutputItem mwapi:item .
             }
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "es" .
+                bd:serviceParam wikibase:language "es,en" .
             }
             ?item (wdt:P279|wdt:P31) ?type.
             VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
@@ -115,7 +115,7 @@ export default (request, response) => {
                 ?item wikibase:apiOutputItem mwapi:item .
             }
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "es" .
+                bd:serviceParam wikibase:language "es,en" .
             }
             ?item (wdt:P279|wdt:P31) ?type.
             VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
@@ -146,7 +146,7 @@ export default (request, response) => {
                 ?item wikibase:apiOutputItem mwapi:item .
             }
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "es" .
+                bd:serviceParam wikibase:language "es,en" .
             }
             ?item (wdt:P279|wdt:P31) wd:Q5.
             ?item wdt:P800 ?works.
@@ -180,7 +180,7 @@ export default (request, response) => {
                 ?item wikibase:apiOutputItem mwapi:item .
             }
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "es" .
+                bd:serviceParam wikibase:language "es,en" .
             }
             ?item (wdt:P279|wdt:P31) ?type.
             VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
@@ -212,7 +212,7 @@ export default (request, response) => {
                 ?item wikibase:apiOutputItem mwapi:item .
             }
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "es" .
+                bd:serviceParam wikibase:language "es,en" .
             }
             ?item (wdt:P279|wdt:P31) ?type.
             VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
@@ -245,7 +245,7 @@ export default (request, response) => {
                 ?num wikibase:apiOrdinal true .
             }
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "es" .
+                bd:serviceParam wikibase:language "es,en" .
             }
             ?item (wdt:P279|wdt:P31) ?type.
             VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
@@ -289,7 +289,7 @@ export default (request, response) => {
                 ?num wikibase:apiOrdinal true .
             }
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "es" .
+                bd:serviceParam wikibase:language "es,en" .
             }
             ?item (wdt:P279|wdt:P31) ?type.
             VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
@@ -325,7 +325,7 @@ export default (request, response) => {
                 ?item wikibase:apiOutputItem mwapi:item .
             }
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "es" .
+                bd:serviceParam wikibase:language "es,en" .
             }
             ?item (wdt:P279|wdt:P31) ?type.
             VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
@@ -359,7 +359,7 @@ export default (request, response) => {
                 ?item wikibase:apiOutputItem mwapi:item .
             }
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "es" .
+                bd:serviceParam wikibase:language "es,en" .
             }
             ?item (wdt:P279|wdt:P31) wd:Q5.
             ?item wdt:P21 ?gender.
@@ -392,7 +392,7 @@ export default (request, response) => {
                 ?item wikibase:apiOutputItem mwapi:item .
             }
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "es" .
+                bd:serviceParam wikibase:language "es,en" .
             }
             ?work (wdt:P279|wdt:P31) ?type .
             VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
@@ -430,7 +430,7 @@ export default (request, response) => {
                 ?num wikibase:apiOrdinal true .
             }
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "es" .
+                bd:serviceParam wikibase:language "es,en" .
             }
             ?item wdt:P31 wd:Q968159 .
             ?work wdt:P135 ?item .
@@ -466,7 +466,7 @@ export default (request, response) => {
                 ?item wikibase:apiOutputItem mwapi:item .
             }
             SERVICE wikibase:label {
-                bd:serviceParam wikibase:language "es" .
+                bd:serviceParam wikibase:language "es,en" .
             }
             ?item wdt:P106 ?type .
             VALUES ?type {wd:Q1028181 wd:Q1281618 wd:Q15296811 wd:Q33231}   
