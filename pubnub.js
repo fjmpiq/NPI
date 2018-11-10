@@ -24,6 +24,10 @@ export default (request, response) => {
     intentMap.set('MedidasObra', medidasObra);
     intentMap.set('GeneroObra', generoObra);
     intentMap.set('HechosSobreObra', hechosSobreObra);
+    intentMap.set('QuienEsAutor', quienEsAutor);
+    intentMap.set('ObrasEnMuseo', obrasEnMuseo);
+    intentMap.set('ObrasDeMovimiento', obrasDeMovimiento);
+    intentMap.set('BiografiaAutor', biografiaAutor);
     
     // Mapa de las respuestas que da cuando falla en la consulta
     let failed = new Map();
@@ -35,6 +39,10 @@ export default (request, response) => {
     failed.set('MedidasObra', "Lo siento, no conozco las medidas de esa obra...");
     failed.set('GeneroObra', "Lo siento, no conozco el género de esa obra...");
     failed.set('HechosSobreObra', "Lo siento, no conozco nada interesante sobre esa obra...");
+    failed.set('QuienEsAutor', "Lo siento, no conozco a ese autor o autora...");
+    failed.set('ObrasEnMuseo', "Lo siento, no conozco obras de ese museo...");
+    failed.set('ObrasDeMovimiento', "Lo siento, no conozco obras de ese movimiento...");
+    failed.set('BiografiaAutor', "Lo siento, no esa información sobre ese autor o autora...");
     
     function tryAgain(){
         tries += 1;
@@ -267,7 +275,7 @@ export default (request, response) => {
     }
     
     // Función que gestiona el intent ObraRelacionada
-    function obraRelacionada(id){
+    function obraRelacionada(){
         const endpointUrl = 'https://query.wikidata.org/sparql',
         sparqlQuery = `
         SELECT ?itemLabel ?creatorLabel ?workLabel WHERE {
@@ -305,7 +313,7 @@ export default (request, response) => {
     }
     
     // Función que gestiona el intent HechosSobreObra
-    function hechosSobreObra(id){
+    function hechosSobreObra(){
         const endpointUrl = 'https://query.wikidata.org/sparql',
         sparqlQuery = `
         SELECT ?itemLabel ?eventLabel ?date WHERE {
@@ -334,6 +342,151 @@ export default (request, response) => {
             else {
                 let events = results.map(e => "En " + e.date.value.substring(0,4) + " se produjo " + e.eventLabel.value + ".");
                 return "Conozco los siguientes eventos sobre " + results[0].itemLabel.value + ":\n" + events.join(" ");
+            }
+        });
+    }
+    
+    // Función que gestiona el intent HechosSobreObra
+    function quienEsAutor(){
+        const endpointUrl = 'https://query.wikidata.org/sparql',
+        sparqlQuery = `
+        SELECT ?itemLabel ?itemDescription ?genderLabel WHERE {
+            SERVICE wikibase:mwapi {
+                bd:serviceParam wikibase:api "EntitySearch" .
+                bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+                bd:serviceParam mwapi:search "picasso" .
+                bd:serviceParam mwapi:language "es" .
+                ?item wikibase:apiOutputItem mwapi:item .
+            }
+            SERVICE wikibase:label {
+                bd:serviceParam wikibase:language "es" .
+            }
+            ?item (wdt:P279|wdt:P31) wd:Q5.
+            ?item wdt:P21 ?gender.
+        } LIMIT 10`,
+        fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery ),
+        headers = { 'Accept': 'application/sparql-results+json' };
+        return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
+            const results = json.results.bindings;
+            if (results.length === 0)
+                return tryAgain();
+            else {
+                let unUna = (results[0].genderLabel.value === "masculino")?"un":"una";
+                return results[0].itemLabel.value + " es " + unUna + " " + results[0].itemDescription.value + ".";
+            }
+        });
+    }
+    
+    // Función que gestiona el intent ObrasEnMuseo
+    function obrasEnMuseo(){
+        const endpointUrl = 'https://query.wikidata.org/sparql',
+        sparqlQuery = `
+        SELECT DISTINCT ?itemLabel ?workLabel WHERE {
+            SERVICE wikibase:mwapi {
+                bd:serviceParam wikibase:api "EntitySearch" .
+                bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+                bd:serviceParam mwapi:search "${any}" .
+                bd:serviceParam mwapi:language "es" .
+                ?item wikibase:apiOutputItem mwapi:item .
+            }
+            SERVICE wikibase:label {
+                bd:serviceParam wikibase:language "es" .
+            }
+            ?work (wdt:P279|wdt:P31) ?type .
+            VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
+            ?item wdt:P31 ?museum .
+            VALUES ?museum {wd:Q207694 wd:Q33506 wd:Q17431399}
+            ?work wdt:P276 ?item.
+        } LIMIT 200`,
+        fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery ),
+        headers = { 'Accept': 'application/sparql-results+json' };
+
+        return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
+            const results = json.results.bindings.filter(r => !/(Q[0-9]+)|(Untitled)/.test(r.workLabel.value));
+            if (results.length === 0)
+                return tryAgain();
+            else if (results.length === 1)
+                return "Una obra que está en " + results[0].itemLabel.value + " es " + results[0].workLabel.value + ".";
+            else if (results.length === 2)
+                return "Algunas obras que están en " + results[0].itemLabel.value + " son " + results[0].workLabel.value + " o " + results[1].workLabel.value;
+            else
+                return "Algunas obras que están en " + results[0].itemLabel.value + " son " + results[0].workLabel.value + ", " + results[1].workLabel.value + " o " + results[2].workLabel.value + ".";
+        });
+    }
+    
+    // Función que gestiona el intent ObrasDeMovimiento
+    function obrasDeMovimiento(){
+        const endpointUrl = 'https://query.wikidata.org/sparql',
+        sparqlQuery = `
+        SELECT ?itemLabel ?workLabel WHERE {
+            SERVICE wikibase:mwapi {
+            bd:serviceParam wikibase:api "EntitySearch" .
+            bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+            bd:serviceParam mwapi:search "surrealismo" .
+            bd:serviceParam mwapi:language "es" .
+            ?item wikibase:apiOutputItem mwapi:item .
+        }
+        SERVICE wikibase:label {
+            bd:serviceParam wikibase:language "es" .
+        }
+        ?item wdt:P31 wd:Q968159 .
+        ?work wdt:P135 ?item .
+        ?work (wdt:P279|wdt:P31) ?type.
+        VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
+    } LIMIT 50`,
+        fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery ),
+        headers = { 'Accept': 'application/sparql-results+json' };
+
+        return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
+            const results = json.results.bindings.filter(r => !/(Q[0-9]+)|(Untitled)/.test(r.workLabel.value));
+            if (results.length === 0)
+                return tryAgain();
+            else if (results.length === 1)
+                return "Una obra que pertenece al " + results[0].itemLabel.value + " es " + results[0].workLabel.value + ".";
+            else if (results.length === 2)
+                return "Algunas obras que pertenecen al " + results[0].itemLabel.value + " son " + results[0].workLabel.value + " o " + results[1].workLabel.value;
+            else
+                return "Algunas obras que pertenecen al " + results[0].itemLabel.value + " son " + results[0].workLabel.value + ", " + results[1].workLabel.value + " o " + results[2].workLabel.value + ".";
+        });
+    }
+    
+    // Función que gestiona el intent BiografiaAutor
+    function biografiaAutor(){
+        const endpointUrl = 'https://query.wikidata.org/sparql',
+        sparqlQuery = `
+        SELECT ?itemLabel ?birthPlaceLabel ?birthDateLabel ?deathPlaceLabel ?deathDateLabel WHERE {
+            SERVICE wikibase:mwapi {
+                bd:serviceParam wikibase:api "EntitySearch" .
+                bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+                bd:serviceParam mwapi:search "ai weiwei" .
+                bd:serviceParam mwapi:language "es" .
+                ?item wikibase:apiOutputItem mwapi:item .
+            }
+            SERVICE wikibase:label {
+                bd:serviceParam wikibase:language "es" .
+            }
+            ?item wdt:P106 ?type .
+            VALUES ?type {wd:Q1028181 wd:Q1281618 wd:Q15296811 wd:Q33231}   
+            ?item wdt:P19 ?birthPlace .
+            ?item wdt:P569 ?birthDate .
+            OPTIONAL {
+                ?item wdt:P20 ?deathPlace .
+                ?item wdt:P570 ?deathDate .
+            }
+        } LIMIT 10`,
+        fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery ),
+        headers = { 'Accept': 'application/sparql-results+json' };
+        return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
+            const results = json.results.bindings;
+            let endOfSentence = "";
+            if (results.length === 0)
+                return tryAgain();
+            else{
+                if (results[0].hasOwnProperty("deathDateLabel"))
+                    endOfSentence = " y murió en " + results[0].deathPlaceLabel.value + " en " + results[0].deathDateLabel.value.substring(0,4) + ".";
+                else
+                    endOfSentence = ".";
+                return results[0].itemLabel.value + " nació en " + results[0].birthPlaceLabel.value + " en " + results[0].birthDateLabel.value.substring(0,4) + endOfSentence;
             }
         });
     }

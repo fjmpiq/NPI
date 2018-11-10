@@ -7,23 +7,23 @@ En todas las sentencias `${any}` es la variable a buscar
 # Creador de `${any}`
 
 ```sql
-SELECT ?itemLabel ?creatorLabel WHERE {
-  SERVICE wikibase:mwapi {
-      bd:serviceParam wikibase:api "EntitySearch" .
-      bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-      bd:serviceParam mwapi:search "${any}" .
-      bd:serviceParam mwapi:language "es" .
-      ?item wikibase:apiOutputItem mwapi:item .
-  }
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "es" .
-   }
-  ?item (wdt:P279|wdt:P31) ?type.
-  VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
-  ?item wdt:P170 ?creator.
+SELECT ?itemLabel ?creatorLabel ?creatorDescription ?genderLabel WHERE {
+    SERVICE wikibase:mwapi {
+        bd:serviceParam wikibase:api "EntitySearch" .
+        bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+        bd:serviceParam mwapi:search "${any}" .
+        bd:serviceParam mwapi:language "es" .
+        ?item wikibase:apiOutputItem mwapi:item .
+    }
+    SERVICE wikibase:label {
+        bd:serviceParam wikibase:language "es" .
+    }
+    ?item (wdt:P279|wdt:P31) ?type.
+    VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
+    ?item wdt:P170 ?creator.
+    ?creator wdt:P21 ?gender.
 } LIMIT 10
 ```
-
 
 # Obras de `${any}`
 
@@ -196,4 +196,91 @@ SELECT ?item ?itemLabel ?creatorLabel ?countryLabel ?locLabel ?inception WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "es"}
 } ORDER BY RAND()
 LIMIT 1000
+```
+
+# Quién es `${any}`
+
+``` sql
+SELECT ?itemLabel ?itemDescription ?genderLabel WHERE {
+  SERVICE wikibase:mwapi {
+      bd:serviceParam wikibase:api "EntitySearch" .
+      bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+      bd:serviceParam mwapi:search "picasso" .
+      bd:serviceParam mwapi:language "es" .
+      ?item wikibase:apiOutputItem mwapi:item .
+  }
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "es" .
+   }
+  ?item (wdt:P279|wdt:P31) wd:Q5.
+  ?item wdt:P21 ?gender.
+} LIMIT 10
+```
+
+# Obras en un museo
+
+``` sql
+SELECT DISTINCT ?itemLabel ?workLabel WHERE {
+  SERVICE wikibase:mwapi {
+      bd:serviceParam wikibase:api "EntitySearch" .
+      bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+      bd:serviceParam mwapi:search "prado" .
+      bd:serviceParam mwapi:language "es" .
+      ?item wikibase:apiOutputItem mwapi:item .
+  }
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "es" .
+   }
+  ?work (wdt:P279|wdt:P31) ?type .
+  VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
+  ?item wdt:P31 ?museum .
+  VALUES ?museum {wd:Q207694 wd:Q33506 wd:Q17431399}
+  ?work wdt:P276 ?item.
+} LIMIT 200
+```
+
+# Obras de un género
+
+``` sql
+SELECT ?itemLabel ?workLabel WHERE {
+  SERVICE wikibase:mwapi {
+      bd:serviceParam wikibase:api "EntitySearch" .
+      bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+      bd:serviceParam mwapi:search "surrealismo" .
+      bd:serviceParam mwapi:language "es" .
+      ?item wikibase:apiOutputItem mwapi:item .
+  }
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "es" .
+   }
+  ?item wdt:P31 wd:Q968159 .
+  ?work wdt:P135 ?item .
+  ?work (wdt:P279|wdt:P31) ?type.
+  VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
+} LIMIT 50
+```
+
+# Biografía de un autor
+
+``` sql
+SELECT ?itemLabel ?birthPlaceLabel ?birthDateLabel ?deathPlaceLabel ?deathDateLabel WHERE {
+  SERVICE wikibase:mwapi {
+      bd:serviceParam wikibase:api "EntitySearch" .
+      bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+      bd:serviceParam mwapi:search "ai weiwei" .
+      bd:serviceParam mwapi:language "es" .
+      ?item wikibase:apiOutputItem mwapi:item .
+  }
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "es" .
+   }
+  ?item wdt:P106 ?type .
+  VALUES ?type {wd:Q1028181 wd:Q1281618 wd:Q15296811 wd:Q33231}
+  ?item wdt:P19 ?birthPlace .
+  ?item wdt:P569 ?birthDate .
+  OPTIONAL {
+    ?item wdt:P20 ?deathPlace .
+    ?item wdt:P570 ?deathDate .
+  }
+} LIMIT 10
 ```
