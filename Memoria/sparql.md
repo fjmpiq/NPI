@@ -249,6 +249,7 @@ SELECT ?itemLabel ?workLabel WHERE {
       bd:serviceParam mwapi:search "surrealismo" .
       bd:serviceParam mwapi:language "es" .
       ?item wikibase:apiOutputItem mwapi:item .
+      ?num wikibase:apiOrdinal true .
   }
   SERVICE wikibase:label {
     bd:serviceParam wikibase:language "es" .
@@ -257,7 +258,7 @@ SELECT ?itemLabel ?workLabel WHERE {
   ?work wdt:P135 ?item .
   ?work (wdt:P279|wdt:P31) ?type.
   VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
-} LIMIT 50
+} ORDER BY ASC(?num) LIMIT 50
 ```
 
 # Biografía de un autor

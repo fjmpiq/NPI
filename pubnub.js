@@ -354,7 +354,7 @@ export default (request, response) => {
             SERVICE wikibase:mwapi {
                 bd:serviceParam wikibase:api "EntitySearch" .
                 bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-                bd:serviceParam mwapi:search "picasso" .
+                bd:serviceParam mwapi:search "${any}" .
                 bd:serviceParam mwapi:language "es" .
                 ?item wikibase:apiOutputItem mwapi:item .
             }
@@ -369,6 +369,8 @@ export default (request, response) => {
         return xhr.fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
             const results = json.results.bindings;
             if (results.length === 0)
+                return tryAgain();
+            else if (!results[0].hasOwnProperty("itemDescription"))
                 return tryAgain();
             else {
                 let unUna = (results[0].genderLabel.value === "masculino")?"un":"una";
@@ -420,20 +422,21 @@ export default (request, response) => {
         sparqlQuery = `
         SELECT ?itemLabel ?workLabel WHERE {
             SERVICE wikibase:mwapi {
-            bd:serviceParam wikibase:api "EntitySearch" .
-            bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-            bd:serviceParam mwapi:search "surrealismo" .
-            bd:serviceParam mwapi:language "es" .
-            ?item wikibase:apiOutputItem mwapi:item .
-        }
-        SERVICE wikibase:label {
-            bd:serviceParam wikibase:language "es" .
-        }
-        ?item wdt:P31 wd:Q968159 .
-        ?work wdt:P135 ?item .
-        ?work (wdt:P279|wdt:P31) ?type.
-        VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
-    } LIMIT 50`,
+                bd:serviceParam wikibase:api "EntitySearch" .
+                bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+                bd:serviceParam mwapi:search "${any}" .
+                bd:serviceParam mwapi:language "es" .
+                ?item wikibase:apiOutputItem mwapi:item .
+                ?num wikibase:apiOrdinal true .
+            }
+            SERVICE wikibase:label {
+                bd:serviceParam wikibase:language "es" .
+            }
+            ?item wdt:P31 wd:Q968159 .
+            ?work wdt:P135 ?item .
+            ?work (wdt:P279|wdt:P31) ?type.
+            VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
+        } ORDER BY ASC(?num) LIMIT 50`,
         fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery ),
         headers = { 'Accept': 'application/sparql-results+json' };
 
@@ -458,7 +461,7 @@ export default (request, response) => {
             SERVICE wikibase:mwapi {
                 bd:serviceParam wikibase:api "EntitySearch" .
                 bd:serviceParam wikibase:endpoint "www.wikidata.org" .
-                bd:serviceParam mwapi:search "ai weiwei" .
+                bd:serviceParam mwapi:search "${any}" .
                 bd:serviceParam mwapi:language "es" .
                 ?item wikibase:apiOutputItem mwapi:item .
             }
