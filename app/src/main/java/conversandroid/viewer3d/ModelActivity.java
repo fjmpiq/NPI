@@ -74,11 +74,11 @@ public class ModelActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        createNewModelView(app.getCurrentModel());
         loadSampleModel();
         if (app.getCurrentModel() != null) {
             setTitle(app.getCurrentModel().getTitle());
         }
+        startVrActivity();
     }
 
     @Override
@@ -92,9 +92,7 @@ public class ModelActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (modelView != null) {
-            modelView.onResume();
-        }
+        finish();
     }
 
     @Override
