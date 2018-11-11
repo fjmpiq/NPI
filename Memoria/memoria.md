@@ -194,7 +194,7 @@ Métodos en `MainActivity`:
 - `setSpeakButton`: Configura el botón de habla
 - `setExtraButtons`: Configura los botones extra (botón QR, botón 3D y botón de opciones)
 - `setTextView`: Establece el texto inicial de la vista principal de texto
-- `onResume`: Registra los sensores
+- `onResume`: Registra los sensores y reinicia la interfaz.
 - `onPause`: Elimina los sensores
 - `onActivityResult`: Gestiona la información devuelta por las actividades de opciones y escaneo QR
 

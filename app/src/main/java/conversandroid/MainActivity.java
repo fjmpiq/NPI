@@ -175,9 +175,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         //Initialize sensors
         setUpSensors();
 
-        //Set up the text view
-        setTextView();
-
         //Initialize the speech recognizer and synthesizer
         initSpeechInputOutput(this);
 
@@ -294,6 +291,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         queryResultTextView = findViewById(R.id.queryResult);
         queryResultTextView.setText(R.string.initial_textView_message);
         queryText = findViewById(R.id.queryText);
+        queryText.setText("");
         findViewById(R.id.queryTextTag).setVisibility(View.INVISIBLE);
 
     }
@@ -304,6 +302,8 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
      */
     protected void onResume() {
         super.onResume();
+        changeButtonAppearanceToDefault();
+        setTextView();
         sManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
         sManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
@@ -354,6 +354,8 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
      * @param file The 3D model to load
      */
     private void launch3DViewer(String file) {
+        changeButtonAppearanceToThinking();
+        queryResultTextView.setText("Cargando... Por favor, pon tu móvil en horizontal y espera a que termine de cargar el modelo.");
         Intent intent = new Intent(getApplicationContext(), ModelActivity.class);
         intent.putExtra("filename", file);
         intent.putExtra("name", models_name.get(file)); // The model name
