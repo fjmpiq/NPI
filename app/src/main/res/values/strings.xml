@@ -49,4 +49,9 @@
     <string name="initial_textView_message">Puedes hacerme una pregunta, ¿no conoces la colección del museo? Tenemos a disposición obras de museos de todo el mundo. \n\n ¿Necesitas inspiración? Prueba a agitar el dispositivo para que muestre una obra al azar.</string>
     <string name="button">Ver 3D</string>
     <string name="qr_button_text">QR</string>
+    <string name="ajustes">Ajustes</string>
+    <string name="umbral_agitado">Umbral agitado</string>
+    <string name="creditos">Musemium es una aplicación realizada por Pablo Baeyens, Francisco Morales y Jesús Sánchez a partir de los proyectos de Github
+        zoraidacallejas/Chatbot, dlazaro66/QRCodeReaderView y dbrant/ModelViewer3D. \n\n Los modelos 3D se han obtenido de Scan The World.
+        </string>
 </resources>

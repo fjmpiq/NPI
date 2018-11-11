@@ -16,7 +16,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="13dp"
         android:layout_marginTop="18dp"
-        android:text="Ajustes"
+        android:text="@string/ajustes"
         android:textColor="@android:color/black"
         android:textSize="24sp" />
 
@@ -27,7 +27,7 @@
         android:layout_below="@+id/textView4"
         android:layout_alignStart="@+id/textView4"
         android:layout_marginTop="21dp"
-        android:text="Umbral agitado" />
+        android:text="@string/umbral_agitado" />
 
     <SeekBar
         android:id="@+id/shake_bar"
@@ -40,14 +40,14 @@
         android:max="50" />
 
     <TextView
-        android:id="@+id/textView7"
+        android:id="@+id/creditos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/textView4"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="0dp"
         android:layout_marginBottom="141dp"
-        android:text="Aquí van los créditos" />
+        android:text="@string/creditos" />
 
     <TextView
         android:id="@+id/shake_value"
