@@ -55,7 +55,7 @@ public class ModelGvrActivity extends GvrActivity implements GvrView.StereoRende
 
     private final float[] viewMatrix = new float[16];
 
-    private static final float MODEL_BOUND_SIZE = 20f;
+    private static final float MODEL_BOUND_SIZE = 5f;
     private static final float Z_NEAR = 0.1f;
     private static final float Z_FAR = MODEL_BOUND_SIZE * 4;
 
@@ -139,7 +139,7 @@ public class ModelGvrActivity extends GvrActivity implements GvrView.StereoRende
         rotateAngleY = 0;
         translateX = 0f;
         translateY = 0f;
-        translateZ = -MODEL_BOUND_SIZE;
+        translateZ = -(MODEL_BOUND_SIZE+3);
         updateViewMatrix();
 
         // Set light matrix before doing any other transforms on the view matrix

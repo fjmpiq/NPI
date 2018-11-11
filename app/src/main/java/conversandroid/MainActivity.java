@@ -39,7 +39,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -51,7 +50,6 @@ import android.hardware.SensorManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import com.google.gson.JsonElement;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -59,7 +57,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
 
 //Check the dependencies necessary to make these imports in
