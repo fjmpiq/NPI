@@ -153,6 +153,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     private static final int SCAN_REQUEST = 3;
     private final int MY_PERMISSIONS_CAMERA = 23; // Const to request permission
 
+    /**
+     * Names of 3D models
+     */
     private HashMap<String,String> models_name = new HashMap<>();
 
     ///////////////////////////////////////////////////////////////////////////
@@ -228,6 +231,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
             e.printStackTrace();
         }
 
+        // Adds model names
         models_name.put("models/venus.obj", "Venus de Willendorf");
         models_name.put("models/david.obj", "David de Miguel Ángel");
         models_name.put("models/piedad_vaticano.obj", "Piedad del Vaticano");
@@ -247,7 +251,11 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         // 3D Button
         Button b3D = findViewById(R.id.launch3d_btn);
         b3D.setOnClickListener(v ->
-            loadModelFromAssets());
+                createChooserDialog(this,
+                        (String file) -> {
+                            if (file != null)
+                                launch3DViewer(file);
+                        }));
 
         // QR Button
         Button qr_button = findViewById(R.id.qr_scanner);
@@ -312,11 +320,19 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     // 3D MODELS
 
+    // Interface for passing callback as function argument
+    // From https://github.com/hedzr/android-file-chooser
     @FunctionalInterface
     public interface Callback {
         void onClick(String asset);
     }
 
+    /**
+     * Creates a pop-up dialog with the artworks.
+     * From https://github.com/hedzr/android-file-chooser
+     * @param context The app context
+     * @param callback The callback function that processes the action to do
+     */
     private static void createChooserDialog(Context context, Callback callback) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Escoge modelo");
@@ -333,18 +349,14 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         builder.create().show();
     }
 
-    private void loadModelFromAssets() {
-        createChooserDialog(this,
-                (String file) -> {
-            if (file != null) launchModelRendererActivity(file);
-        });
-    }
-
-
-    private void launchModelRendererActivity(String file) {
+    /**
+     * Launches 3D viewer activity
+     * @param file The 3D model to load
+     */
+    private void launch3DViewer(String file) {
         Intent intent = new Intent(getApplicationContext(), ModelActivity.class);
         intent.putExtra("filename", file);
-        intent.putExtra("name", models_name.get(file));
+        intent.putExtra("name", models_name.get(file)); // The model name
         startActivity(intent);
     }
 
@@ -730,7 +742,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                 changeButtonAppearanceToDefault();
                 final String chatbotResponse = result.getFulfillment().getSpeech();
                 if (chatbotResponse.matches(".+\\.obj")) {
-                    launchModelRendererActivity(chatbotResponse);
+                    launch3DViewer(chatbotResponse);
                 }
                 else {
                     try {

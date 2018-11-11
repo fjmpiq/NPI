@@ -371,12 +371,17 @@ La implementación de funciones del resto de intents es muy similar, cambiando s
 ## Interfaz de sensores
 ### Modelos 3D
 
-Métodos en `MainActivity`:
+Métodos e interfaces en `MainActivity`:
 
-- `loadModelFromAssets`: Crea un menú de selección para elegir el modelo que queremos visualizar.
-- `launchModelRendererActivity`: dado un archivo de un modelo 3D llama a la activity que se encarga de visualizarlo (`ModelActivity`).
+- `createChooserDialog` y `Callback`: Versión modificada de recurso externo para crear menú de visor 3D
+- `launch3Dviewer`: dado un archivo de un modelo 3D llama a la activity que se encarga de visualizarlo (`ModelActivity`).
 
-`ModelActivity` es un recurso externo al que se ha modificado la interfaz y limitado algunos aspectos de su funcionamiento para adaptarlo al uso de nuestra aplicación. Esta clase a su vez hace uso de otras como `ArrayModel`, `Floor`, `IndexedModel`, `Light`, `Model`, `ModelRenderer,` `ModelSurfaceView`, `ModelViewerApplication`, `ModelGvrActivity`, `ObjModel` o `Util`.
+Atributos en `MainActivity`:
+
+- `models_name`: Nombres de los modelos 3D
+
+`ModelActivity` es un recurso externo al que se ha modificado la interfaz y limitado algunos aspectos de su funcionamiento para adaptarlo al uso de nuestra aplicación. Esta clase a su vez hace uso de otras que hemos agrupado en el paquete `viewer3d`.
+Utiliza el visor de realidad virtual de Google Cardboard en modo mono en el que hemos modificado la interfaz y la carga de ficheros.
 
 ### Sensor QR
 
@@ -442,7 +447,7 @@ Para el visionado de modelos 3D hemos utilizado parcialmente el código del sigu
 : Para la implementación del visor 3D hemos partido de esta aplicación, que hemos modificado para incluir la
   interacción mediante el sensor de vector de rotación.
 
-Además, las figuras 3D de obras de arte se han obtenido de [Scan The World](https://www.myminifactory.com/es/scantheworld/). Las hemos tratado utilizando Blender para reducir el número de vértices.
+Además, las figuras 3D de obras de arte se han obtenido de [Scan The World](https://www.myminifactory.com/es/scantheworld/). Las hemos tratado utilizando Blender para reducir el número de vértices. Además, el menú de selección de obras es una versión modificada del código de [este proyecto](https://github.com/hedzr/android-file-chooser)
 
 ## Otros recursos
 
