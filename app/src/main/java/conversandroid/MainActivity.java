@@ -35,9 +35,15 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+<<<<<<< 44dca431f448ddb86722d12557018d44f161519e
 import android.text.Html;
+||||||| merged common ancestors
+=======
+import android.support.v7.app.AppCompatActivity;
+>>>>>>> Usa https://github.com/dbrant/ModelViewer3D como visor 3D
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -75,7 +81,6 @@ import ai.api.model.AIResponse;
 import ai.api.model.Result;
 
 import conversandroid.talkback.R;
-import conversandroid.viewer3d.ModelActivity;
 import conversandroid.viewerqr.DecoderActivity;
 
 
@@ -97,7 +102,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     private static final Integer ID_PROMPT_QUERY = 0;
     private static final Integer ID_PROMPT_INFO = 1;
-
 
     /**
      * Access to the main TextView
@@ -158,6 +162,9 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
      */
     private static final int SCAN_REQUEST = 3;
     private final int MY_PERMISSIONS_CAMERA = 23; // Const to request permission
+
+    /////////
+    private ModelViewerApplication app;
 
     ///////////////////////////////////////////////////////////////////////////
     // METHODS                                                               //
@@ -244,7 +251,8 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
         // 3D Button
         Button b3D = findViewById(R.id.launch3d_btn);
-        b3D.setOnClickListener(v -> loadModelFromAssets());
+        b3D.setOnClickListener(v ->
+            loadModelFromAssets());
 
         // QR Button
         Button qr_button = findViewById(R.id.qr_scanner);
@@ -314,19 +322,16 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                 (String file) -> {
                     if (file != null) {
                         ContentUtils.provideAssets(this);
-                        launchModelRendererActivity(Uri.parse("assets://" + getPackageName() + "/" + file), file);
+                        launchModelRendererActivity(file);
                     }
                 });
     }
 
 
-    private void launchModelRendererActivity(Uri uri, String name) {
+    private void launchModelRendererActivity(String name) {
         ContentUtils.provideAssets(this); /////
-        Log.i("Menu", "Launching renderer for '" + uri + "'");
-        Intent intent = new Intent(getApplicationContext(), ModelActivity.class);
-        intent.putExtra("uri", uri.toString());
+        Intent intent = new Intent(getApplicationContext(), conversandroid.ModelActivity.class);
         intent.putExtra("name", name);
-        // content provider case
         startActivity(intent);
     }
 
@@ -710,7 +715,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
                 final String chatbotResponse = result.getFulfillment().getSpeech();
                 if (chatbotResponse.matches(".+\\.obj")) {
-                    launchModelRendererActivity(Uri.parse("assets://" + getPackageName() + "/" + chatbotResponse), chatbotResponse);
+                    launchModelRendererActivity(chatbotResponse);
                 }
                 else {
                     changeButtonAppearanceToDefault();
