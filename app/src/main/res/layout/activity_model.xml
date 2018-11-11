@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorWindowBackground"
-    tools:context="conversandroid.ModelActivity">
+    tools:context="conversandroid.viewer3d.ModelActivity">
 
     <ProgressBar
         android:id="@+id/model_progress_bar"

@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RawRes;
 import android.util.Log;
 
-import conversandroid.ModelViewerApplication;
+import conversandroid.viewer3d.ModelViewerApplication;
 
 import java.io.Closeable;
 import java.io.IOException;

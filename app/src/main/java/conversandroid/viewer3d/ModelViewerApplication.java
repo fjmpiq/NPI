@@ -1,8 +1,7 @@
-package conversandroid;
+package conversandroid.viewer3d;
 
 import android.app.Application;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 /*
  * Copyright 2017 Dmitry Brant. All rights reserved.

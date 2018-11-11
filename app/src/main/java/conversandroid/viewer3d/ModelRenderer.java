@@ -1,4 +1,4 @@
-package conversandroid;
+package conversandroid.viewer3d;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;

@@ -1,11 +1,9 @@
 package gvr;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.TypedValue;
@@ -14,9 +12,9 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import conversandroid.Light;
-import conversandroid.Model;
-import conversandroid.ModelViewerApplication;
+import conversandroid.viewer3d.Light;
+import conversandroid.viewer3d.Model;
+import conversandroid.viewer3d.ModelViewerApplication;
 import conversandroid.talkback.R;
 import util.Util;
 import com.google.vr.sdk.base.AndroidCompat;

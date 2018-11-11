@@ -2,7 +2,7 @@ package stl;
 
 import android.support.annotation.NonNull;
 
-import conversandroid.ArrayModel;
+import conversandroid.viewer3d.ArrayModel;
 import util.Util;
 
 import java.io.BufferedInputStream;
