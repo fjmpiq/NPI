@@ -566,7 +566,6 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         if(nBestList!=null && nBestList.size()>0){
             Log.d(LOGTAG, "ASR best result: " + nBestList.get(0));
             queryText.setText(nBestList.get(0));
-            changeButtonAppearanceToThinking();
             sendMsgToChatBot(nBestList.get(0)); //Send the best recognition hypothesis to the chatbot
         }
     }
@@ -683,6 +682,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                 return response;
             } catch (AIServiceException e) {
                 try {
+                    changeButtonAppearanceToDefault();
                     speak("Error al conectarse con Dialog Flow", "ES", ID_PROMPT_INFO);
                     Log.e(LOGTAG,"Problems retrieving a response");
                 } catch (Exception ex) {
@@ -713,12 +713,13 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                     queryText.setText(Html.fromHtml(original.replace(any, "<b>" + any + "</b>")));
                 }
 
+                findViewById(R.id.queryTextTag).setVisibility(View.VISIBLE);
+                changeButtonAppearanceToDefault();
                 final String chatbotResponse = result.getFulfillment().getSpeech();
                 if (chatbotResponse.matches(".+\\.obj")) {
                     launchModelRendererActivity(chatbotResponse);
                 }
                 else {
-                    changeButtonAppearanceToDefault();
                     try {
                         speak(chatbotResponse, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is neccessary to include a special "last_exchange" intent in dialogflow and process it here
                         //so that the last system answer is synthesized using ID_PROMPT_INFO.
@@ -736,11 +737,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
      */
 
     private void sendMsgToChatBot(String userInput) {
-
-        //final AIRequest aiRequest = new AIRequest();
-        //aiRequest.setQuery(userInput);
-
-
+        changeButtonAppearanceToThinking();
         AsyncTask<String,Void,AIResponse> myAsyncTask = new MyAsyncTaskClass();
         myAsyncTask.execute(userInput);
 
