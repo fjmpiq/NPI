@@ -181,14 +181,14 @@ Cada atributo y método que hemos implementado tiene además su documentación e
 ## Interfaz y recursos comunes
 
 `MainActivity` es la actividad principal de la aplicación.
-Es una subclase de `VoiceActivity` (TODO: descripción) e implementa la interfaz `SensorEventListener` para poder gestionar los sensores.
+Es una subclase de `VoiceActivity` (clase que gestiona la interacción oral) e implementa la interfaz `SensorEventListener` para poder gestionar los sensores. Está construida a partir del recurso externo `zoraidacallejas/Chatbot`.
 
-Atributos generales en MainActivity:
+Atributos generales en `MainActivity`:
 
 - `LOGTAG`: Etiqueta de la actividad para mensajes de depuración
 - `queryResultTextView`: Vista principal de texto. 
 
-Métodos en MainActivity:
+Métodos en `MainActivity`:
 
 - `onCreate`: Inicializa la interfaz visual, de voz y los sensores
 - `setSpeakButton`: Configura el botón de habla
@@ -201,13 +201,13 @@ Métodos en MainActivity:
 ## Interfaz de voz
 ### Texto y voz
 
-Atributos en MainActivity:
+Atributos en `MainActivity`:
 
-- `ID_PROMPT_QUERY` e `ID_PROMPT_INFO`: TODO
+- `ID_PROMPT_QUERY` e `ID_PROMPT_INFO`: Indican si el mensaje es una respuesta o información (por ejemplo sobre un error)
 - `startListeningTime`: Indica el tiempo en el que se empezó a escuchar por última vez para procesado de errores.
 - `initialPromptDone`: Indica si el mensaje inicial debe ser reproducido (`false`) o no (`true`).
 
-Métodos en MainActivity:
+Métodos en `MainActivity`:
 
 - `showRecordPermissionExplanation`: indica que necesita el micrófono
 - `onRecordAudioPermissionDenied`: Indica que no puede funcionar sin micrófono
@@ -225,19 +225,19 @@ Métodos en MainActivity:
 
 Clases relacionadas:
 
-- `VoiceActivity`: TODO
+- `VoiceActivity`: Clase abstracta que extiende `MainActivity` para implementar la interacción oral
 
 ### Integración con DialogFlow
 
-Atributos en MainActivity:
+Atributos en `MainActivity`:
 
 - `aiDataService`: Conexión al servicio de DialogFlow.
 
-Métodos en MainActivity:
+Métodos en `MainActivity`:
 
 - `sendMsgToChatBot`: envía mensaje escuchado al bot.
 
-Clases en MainActivity:
+Clases en `MainActivity`:
 
 - `MyAsyncTaskClass`: Clase que se encarga de enviar la petición a DialogFlow de forma asíncrona.
 
@@ -392,7 +392,7 @@ Clases relacionadas:
 
 ### Sensor QR
 
-Métodos en MainActivity:
+Métodos en `MainActivity`:
 
 - `qrScan`: Inicializa actividad de escaneo
 - `checkScanPermissions`: Comprueba si hay permisos para la cámara.
@@ -400,11 +400,11 @@ Métodos en MainActivity:
 - ver también [Interfaz y recursos comunes] para funciones que comparte con otras partes de la interfaz
 
 También se hace uso de `DecoderActivity`, que es un recurso externo. 
-En esta actividad hemos traducido la interfaz y eliminado algunas características innecesarias para nuestra aplicación. TODO: Algo más?
+En esta actividad hemos traducido la interfaz y eliminado algunas características innecesarias para nuestra aplicación.
 
 ### Sensores de proximidad y agitación
 
-Atributos en MainActivity:
+Atributos en `MainActivity`:
 
 - `sManager`: Gestor de sensores
 - `proximitySensor`: Sensor de proximidad
@@ -414,7 +414,7 @@ Atributos en MainActivity:
 - `mAccelLast`: Última aceleración sin ajustar
 - `artworks`: objeto JSON que guarda las obras para sugerir obras aleatorias
 
-Métodos en MainActivity:
+Métodos en `MainActivity`:
 
 - `setUpSensors`: Configura sensores
 - `onAccuracyChanged`: Método vacío necesario para implementar la interfaz de escucha de sensores
@@ -422,5 +422,42 @@ Métodos en MainActivity:
 - `onShake`: Reproduce mensaje de obra aleatoria al agitar.
 - `randArtwork`: Genera información sobre obra aleatoria.
 
+
 # Recursos externos utilizados
+
+Esta sección describe los recursos externos utilizados.
+Cuando el código utilizado para la implementación de una actividad es parcial o totalmente externo se indica así en el código fuente.
+
+## Interfaz de voz e interfaz básica
+
+El principal recurso externo utilizado ha sido el proyecto de Zoraida, que hemos usado como inicio:
+
+[`zoraidacallejas/Chatbot`](https://github.com/zoraidacallejas/Chatbot)
+: Para la implementación inicial de la aplicación hemos partido del proyecto de Zoraida.
+  Hemos modificado la interfaz para adaptarla a nuestra aplicación y añadido el código necesario para las nuevas 
+  funcionalidades.
+
+Además como punto inicial para la construcción de las consultas a Wikidata hemos utilizado los ejemplos disponibles en la [página de ejemplos de Wikidata](https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/queries/examples).
+
+## Sensores
+
+Para la lectura de códigos QR hemos utilizado el código siguiente proyecto:
+
+[`dlazaro66/QRCodeReaderView`](https://github.com/dlazaro66/QRCodeReaderView)
+: Para la implementación del visor QR hemos partido del visor de códigos QR de este proyecto de Github.
+  Hemos modificado la interfaz para adaptarla a nuestra aplicación. El resto de la interacción se realiza desde 
+  `MainActivity` en los métodos `qrScan` y `onActivityResult`.
+  
+Para el visionado de modelos 3D hemos utilizado parcialmente el código del siguiente proyecto:
+
+[`dbrant/ModelViewer3D`](https://github.com/dbrant/ModelViewer3D)
+: Para la implementación del visor 3D hemos partido de esta aplicación, que hemos modificado para incluir la 
+  interacción mediante el sensor de vector de rotación.
+  
+Además, las figuras 3D de obras de arte se han obtenido de [Scan The World](https://www.myminifactory.com/es/scantheworld/). Las hemos tratado utilizando Blender para reducir el número de vértices.
+
+## Otros recursos
+
+Hemos hecho uso de la documentación de Android y de la plataforma StackOverflow para aprender cómo utilizar las funcionalidades básicas en relación a Android, SPARQL y Pubnub.
+
 
