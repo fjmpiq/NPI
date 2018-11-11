@@ -124,7 +124,7 @@ Las consultas que hacen uso de Wikidata son:
 | `ObraRelacionada` | Obras del mismo autor | *Dime obras relacionadas con La Joven de la Perla* |
 | `ObrasDeAutor` | Obras de un autor | *Dime obras de Jeff Koons* |
 
-Para Wikidata hacemos uso Pubnub, con el código que puede consultarse en el fichero adjunto `pubnub.js`.
+Para Wikidata hacemos uso de Pubnub, con el código que puede consultarse en el fichero adjunto `pubnub.js`.
 El sistema intenta reconocer sobre qué obra se pregunta y busca la información asociada en Wikidata, dando una respuesta descriptiva en relación a lo que pregunta el usuario en caso de obtener la información o una respuesta genérica cuando esta información no se encuentra disponible.
 
 El funcionamiento se describe en la sección [Uso de Wikidata].
