@@ -4,8 +4,8 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.support.annotation.NonNull;
 
-import conversandroid.IndexedModel;
-import conversandroid.Light;
+import conversandroid.viewer3d.IndexedModel;
+import conversandroid.viewer3d.Light;
 import conversandroid.talkback.R;
 import util.Util;
 

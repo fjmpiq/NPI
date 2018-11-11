@@ -2,7 +2,7 @@ package obj;
 
 import android.support.annotation.NonNull;
 
-import conversandroid.IndexedModel;
+import conversandroid.viewer3d.IndexedModel;
 import util.Util;
 
 import java.io.BufferedInputStream;

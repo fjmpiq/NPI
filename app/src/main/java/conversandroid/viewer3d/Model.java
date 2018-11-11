@@ -1,4 +1,4 @@
-package conversandroid;
+package conversandroid.viewer3d;
 
 import android.opengl.Matrix;
 import android.support.annotation.NonNull;

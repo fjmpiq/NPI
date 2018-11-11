@@ -15,7 +15,7 @@
         android:allowBackup="true"
         android:icon="@drawable/conversandroid"
         android:label="@string/app_name"
-        android:name="conversandroid.ModelViewerApplication"
+        android:name="conversandroid.viewer3d.ModelViewerApplication"
         android:theme="@style/AppTheme" >
         <activity
             android:name="conversandroid.MainActivity"
@@ -33,7 +33,7 @@
             >
         </activity>
         <activity android:name="conversandroid.OptionsActivity" />
-        <activity android:name="conversandroid.ModelActivity" />
+        <activity android:name="conversandroid.viewer3d.ModelActivity" />
 
         <activity
             android:name="gvr.ModelGvrActivity"
