@@ -58,6 +58,7 @@ import org.json.JSONException;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Random;
 
@@ -91,7 +92,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     private static final Integer ID_PROMPT_INFO = 1;
     private static final int SETTINGS_REQUEST = 2;
     private static final int SCAN_REQUEST = 3;
-    private static final int MODEL_REQUEST = 4;
+
     // Access to textView
     private TextView queryResultTextView;
 
@@ -129,8 +130,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     private final int MY_PERMISSIONS_CAMERA = 23; // Const to request permission
     String scannedCode = "";
 
-    /////////
-    private ModelViewerApplication app;
+    private HashMap<String,String> models_name = new HashMap<>();
 
     ///////////////////////////////////////////////////////////////////////////
     // METHODS                                                               //
@@ -208,6 +208,11 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
             e.printStackTrace();
         }
 
+        models_name.put("models/venus.obj", "Venus de Willendorf");
+        models_name.put("models/david.obj", "David de Miguel Ángel");
+        models_name.put("models/piedad_vaticano.obj", "Piedad del Vaticano");
+        models_name.put("models/ship.obj", "Nave (Prueba)");
+        models_name.put("models/urinal.obj", "Fuente de Duchamp");
     }
 
     /**
@@ -302,10 +307,11 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     }
 
 
-    private void launchModelRendererActivity(String name) {
+    private void launchModelRendererActivity(String file) {
         ContentUtils.provideAssets(this); /////
-        Intent intent = new Intent(getApplicationContext(), conversandroid.ModelActivity.class);
-        intent.putExtra("name", name);
+        Intent intent = new Intent(getApplicationContext(), ModelActivity.class);
+        intent.putExtra("filename", file);
+        intent.putExtra("name", models_name.get(file));
         startActivity(intent);
     }
 
