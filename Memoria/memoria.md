@@ -37,7 +37,7 @@ en un único lugar?
 
 Nuestra propuesta es justo esa. Desprendernos de la idea arquetípica
 de museo. Tan solo necesitamos: Una pantalla, un teléfono y acceso a
-internet. 
+internet.
 
 Con esto podemos preguntar sobre cualquier obra o autor de la que se
 disponga información en nuestro museo. Y nuestra colección tiene
@@ -140,6 +140,8 @@ Puede accederse a esta actividad de la aplicación de dos formas
 1. Mediante el uso del botón de 3D, que proporciona un menú que da acceso a las figuras disponibles.
 2. Mediante el uso de comandos de voz del tipo *Enséñame el David de Miguel Ángel* que muestran la figura asociada si está disponible.
 
+El visor 3D utilizado es además compatible con el uso de las Google Cardboard para mejorar la experiencia de usuario si se dispone de unas.
+
 Las figuras disponibles son:
 
 1. El Pensador de Rodin,
@@ -186,7 +188,7 @@ Es una subclase de `VoiceActivity` (clase que gestiona la interacción oral) e i
 Atributos generales en `MainActivity`:
 
 - `LOGTAG`: Etiqueta de la actividad para mensajes de depuración
-- `queryResultTextView`: Vista principal de texto. 
+- `queryResultTextView`: Vista principal de texto.
 
 Métodos en `MainActivity`:
 
@@ -218,7 +220,7 @@ Métodos en `MainActivity`:
 - `processAsrResults`: Toma el mejor resultado escuchado y lo manda al chatbot
 - `deviceConnectedToInternet`: Comprueba si el dispositivo está conectado a Internet
 - `onDestroy`: Desactiva el motor de voz
-- `onTTSDone`: Registra el sensor de aceleración 
+- `onTTSDone`: Registra el sensor de aceleración
 - `onTTSError`: Indica por log que ha habido un error.
 - `onTTSStart`: Indica por log que empieza a hablar
 - `onClick`: Gestiona el comportamiento del botón de habla (mensaje inicial o escucha)
@@ -245,7 +247,7 @@ TODO: Hablar de la clase MyAsyncTaskClass.
 
 ### Uso de Wikidata (Pubnub)
 
-Para la resolución de algunas de las consultas hacemos uso de Wikidata, una base de datos apoyada en Wikipedia que nos permite obtener información sobre las obras de arte del museo. 
+Para la resolución de algunas de las consultas hacemos uso de Wikidata, una base de datos apoyada en Wikipedia que nos permite obtener información sobre las obras de arte del museo.
 El código está alojado en Pubnub y lo adjuntamos en el fichero `pubnub.js`.
 
 Wikidata es una base de datos basada en tripletas Propiedad - Relación - Objeto.
@@ -273,7 +275,7 @@ El funcionamiento básico de la interacción con Wikidata por parte de DialogFlo
 - falla una vez, se prueba de nuevo eliminando los artículos iniciales.
 - falla dos veces, se devuelve un mensaje de error genérico asociado al intent.
 
-A continuación vemos un ejemplo de función que resuelve una consulta de `AutorDeObra` 
+A continuación vemos un ejemplo de función que resuelve una consulta de `AutorDeObra`
 (*¿Quién es el autor de La Mona Lisa?*).
 
 En primer lugar discutimos la consulta de SPARQL que utilizamos para este intent (ligeramente simplificada para facilitar la explicación).
@@ -291,11 +293,11 @@ SELECT ?itemLabel ?creatorLabel ?creatorDescription ?genderLabel WHERE {
     bd:serviceParam mwapi:language "es" .
     ?item wikibase:apiOutputItem mwapi:item .
   }
-  
+
   SERVICE wikibase:label {
     bd:serviceParam wikibase:language "es" .
   }
-  
+
   ?item wdt:P31 ?type.
   VALUES ?type {wd:Q3305213 wd:Q18573970 wd:Q219423 wd:Q179700}
   ?item wdt:P170 ?creator.
@@ -323,10 +325,10 @@ Para todas las consultas hacemos uso de dos servicios:
 
 1. El servicio de búsqueda de MediaWiki (`SERVICE wikibase:mwapi`), que nos permite buscar a partir de la entrada del usuario entre las entidades de Wikidata. Lo hace a partir del valor `${any}` obtenido por DialogFlow como una entidad `any` en la consulta y
 2. El servicio de etiquetas de Wikidata (`SERVICE wikibase:label`), que nos permite darle nombre y descripción a las entidades encontradas.
-   Usando este servicio, si tenemos una entidad `?A`, las variables `?ALabel` y `?ADescription` contienen su 
+   Usando este servicio, si tenemos una entidad `?A`, las variables `?ALabel` y `?ADescription` contienen su
    nombre y descripción respectivamente.
 
-Por último tenemos el cuerpo de la función. 
+Por último tenemos el cuerpo de la función.
 Utilizamos un bloque de tipo `VALUES` y la sintaxis básica de SPARQL, que nos permite razonar sobre las tripletas.
 Una sentencia básica es de la forma `A prop B.` que se lee *"`A` tiene valor `B` en la propiedad `prop`"*.
 
@@ -339,7 +341,7 @@ Las sentencias del cuerpo de la request tienen el siguiente significado:
 
 De esta forma la consulta nos devuelve obras de arte (esto es, pinturas, grupos de pinturas, murales o estatuas) que coincidan con la consulta del usuario y nos proporciona además su creador y una descripción del mismo.
 La última línea limita el número de resultados a 10.
-   
+
 A continuación explicamos brevemente el código en Javascript implementado en Pubnub.
 La variable `sparqlQuery` contiene la consulta a la base de datos de Wikidata que acabamos de mostrar.
 
@@ -349,7 +351,7 @@ function autorDeObra(){
   sparqlQuery = `...`,
   fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery ),
   headers = { 'Accept': 'application/sparql-results+json' };
-  
+
 )  return xhr.fetch(fullUrl, { headers } )
   .then( body => body.json() )
   .then( json => {
@@ -357,9 +359,9 @@ function autorDeObra(){
     if (results.length === 0)
       return tryAgain();
     else
-      return autorAutora(results[0].genderLabel.value) + 
-      " de " + results[0].itemLabel.value + 
-      " es " + results[0].creatorLabel.value + 
+      return autorAutora(results[0].genderLabel.value) +
+      " de " + results[0].itemLabel.value +
+      " es " + results[0].creatorLabel.value +
       ", " + results[0].creatorDescription.value + ".";
   });
 }
@@ -375,31 +377,23 @@ La implementación de funciones del resto de intents es muy similar, cambiando s
 ## Interfaz de sensores
 ### Modelos 3D
 
-Atributos en MainActivity:
+Métodos en `MainActivity`:
 
-- loadModelParameters
+- `loadModelFromAssets`: Crea un menú de selección para elegir el modelo que queremos visualizar.
+- `launchModelRendererActivity`: dado un archivo de un modelo 3D llama a la activity que se encarga de visualizarlo (`ModelActivity`).
 
-Métodos en MainActivity:
-
-- loadModelFromAssets
-- launchModelRendererActivity
-
-Clases relacionadas:
-
-- ModelActivity
-- ModelSurfaceView
-- ModelRenderer
+`ModelActivity` es un recurso externo al que se ha modificado la interfaz y limitado algunos aspectos de su funcionamiento para adaptarlo al uso de nuestra aplicación. Esta clase a su vez hace uso de otras como `ArrayModel`, `Floor`, `IndexedModel`, `Light`, `Model`, `ModelRenderer,` `ModelSurfaceView`, `ModelViewerApplication`, `ModelGvrActivity`, `ObjModel` o `Util`.
 
 ### Sensor QR
 
 Métodos en `MainActivity`:
 
-- `qrScan`: Inicializa actividad de escaneo
+- `qrScan`: Inicializa actividad de escaneo.
 - `checkScanPermissions`: Comprueba si hay permisos para la cámara.
 - `onRequestPermissionResult` y `onCameraPermissionDenied`: Explica al usuario la necesidad de dar permiso para la cámara
 - ver también [Interfaz y recursos comunes] para funciones que comparte con otras partes de la interfaz
 
-También se hace uso de `DecoderActivity`, que es un recurso externo. 
+También se hace uso de `DecoderActivity`, que es un recurso externo.
 En esta actividad hemos traducido la interfaz y eliminado algunas características innecesarias para nuestra aplicación.
 
 ### Sensores de proximidad y agitación
@@ -434,7 +428,7 @@ El principal recurso externo utilizado ha sido el proyecto de Zoraida, que hemos
 
 [`zoraidacallejas/Chatbot`](https://github.com/zoraidacallejas/Chatbot)
 : Para la implementación inicial de la aplicación hemos partido del proyecto de Zoraida.
-  Hemos modificado la interfaz para adaptarla a nuestra aplicación y añadido el código necesario para las nuevas 
+  Hemos modificado la interfaz para adaptarla a nuestra aplicación y añadido el código necesario para las nuevas
   funcionalidades.
 
 Además como punto inicial para la construcción de las consultas a Wikidata hemos utilizado los ejemplos disponibles en la [página de ejemplos de Wikidata](https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/queries/examples).
@@ -445,19 +439,17 @@ Para la lectura de códigos QR hemos utilizado el código siguiente proyecto:
 
 [`dlazaro66/QRCodeReaderView`](https://github.com/dlazaro66/QRCodeReaderView)
 : Para la implementación del visor QR hemos partido del visor de códigos QR de este proyecto de Github.
-  Hemos modificado la interfaz para adaptarla a nuestra aplicación. El resto de la interacción se realiza desde 
+  Hemos modificado la interfaz para adaptarla a nuestra aplicación. El resto de la interacción se realiza desde
   `MainActivity` en los métodos `qrScan` y `onActivityResult`.
-  
+
 Para el visionado de modelos 3D hemos utilizado parcialmente el código del siguiente proyecto:
 
 [`dbrant/ModelViewer3D`](https://github.com/dbrant/ModelViewer3D)
-: Para la implementación del visor 3D hemos partido de esta aplicación, que hemos modificado para incluir la 
+: Para la implementación del visor 3D hemos partido de esta aplicación, que hemos modificado para incluir la
   interacción mediante el sensor de vector de rotación.
-  
+
 Además, las figuras 3D de obras de arte se han obtenido de [Scan The World](https://www.myminifactory.com/es/scantheworld/). Las hemos tratado utilizando Blender para reducir el número de vértices.
 
 ## Otros recursos
 
 Hemos hecho uso de la documentación de Android y de la plataforma StackOverflow para aprender cómo utilizar las funcionalidades básicas en relación a Android, SPARQL y Pubnub.
-
-
