@@ -140,8 +140,6 @@ Puede accederse a esta actividad de la aplicación de dos formas
 1. Mediante el uso del botón de 3D, que proporciona un menú que da acceso a las figuras disponibles.
 2. Mediante el uso de comandos de voz del tipo *Enséñame el David de Miguel Ángel* que muestran la figura asociada si está disponible.
 
-El visor 3D utilizado es además compatible con el uso de las Google Cardboard para mejorar la experiencia de usuario si se dispone de unas.
-
 Las figuras disponibles son:
 
 1. El Pensador de Rodin,
@@ -239,11 +237,7 @@ Métodos en `MainActivity`:
 
 - `sendMsgToChatBot`: envía mensaje escuchado al bot.
 
-Clases en `MainActivity`:
-
-- `MyAsyncTaskClass`: Clase que se encarga de enviar la petición a DialogFlow de forma asíncrona.
-
-TODO: Hablar de la clase MyAsyncTaskClass.
+Se hace uso además de la clase `MyAsyncTaskClass`, implementada dentro de `MainActivity`, que se encarga de enviar la petición a DialogFlow de manera asíncrona. Esta clase extiende la clase `AsyncTask` e implementa dos métodos: `doInBackGround` y `onPostExecute`. El método `doInBackGround` es el que se encarga de hacer la petición a DialogFlow, mientras que el método `onPostExecute` es el que se ejecuta cuando se recibe la respuesta de DialogFlow y se encarga de actualizar `queryText` y lanzar el visor 3D si se ha pedido visualizar un modelo o hacer que se sintetice a voz la respuesta si se ha hecho una pregunta.
 
 ### Uso de Wikidata (Pubnub)
 
