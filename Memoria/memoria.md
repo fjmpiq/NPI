@@ -16,6 +16,8 @@ toc: true
 
 \newpage
 
+**Nota:** No hemos podido adjuntar el vídeo promocional de la aplicación con toda la calidad posible debido a las restricciones de tamaño a la hora de subir el proyecto. Por tanto hemos subido una copia a mayor calidad del vídeo a Youtube. Está disponible en el siguiente enlace <https://youtu.be/NJS5DeoT9q0>.
+
 # Introducción e idea de museo
 
 ***Musemium***
@@ -187,6 +189,7 @@ Atributos generales en `MainActivity`:
 
 - `LOGTAG`: Etiqueta de la actividad para mensajes de depuración
 - `queryResultTextView`: Vista principal de texto.
+- `queryText`: Texto que muestra la consulta en tiempo real.
 
 Métodos en `MainActivity`:
 
@@ -225,7 +228,8 @@ Métodos en `MainActivity`:
 
 Clases relacionadas:
 
-- `VoiceActivity`: Clase abstracta que extiende `MainActivity` para implementar la interacción oral
+- `VoiceActivity`: Clase abstracta que extiende `MainActivity` para implementar la interacción oral.
+  Sólo hemos modificado el método `listen` para poder obtener resultados parciales.
 
 ### Integración con DialogFlow
 
