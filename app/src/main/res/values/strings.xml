@@ -34,6 +34,17 @@
     <string name="asr_error_speechtimeout">No he escuchado correctamente. Por favor, repite la pregunta</string>
     <string name="asr_notstarted">No se ha podido comenzar la grabación</string>
 
+    <!-- ModelViewer3D -->
+    <string name="about">About…</string>
+    <string name="about_text">Copyright © 2017–2018 Dmitry Brant.</string>
+    <string name="load_sample">Load sample</string>
+    <string name="read_permission_failed">Please allow read permission to open model files.</string>
+    <string name="open_model">Open model…</string>
+    <string name="open_model_success">Model loaded successfully.</string>
+    <string name="open_model_error">Failed to load model.</string>
+    <string name="view_vr">View in VR mode</string>
+    <string name="view_vr_not_loaded">Please load a model first.</string>
+
     <!-- Camera -->
     <string name="camera_permissions_denied">Por favor, permita el acceso a la cámara para poder usar el lector de QR</string>
     <!-- onShake messages -->
