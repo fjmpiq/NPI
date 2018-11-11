@@ -23,7 +23,9 @@ package conversandroid;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
@@ -49,7 +51,6 @@ import android.hardware.SensorManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-
 import com.google.gson.JsonElement;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -313,19 +314,36 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
     // 3D MODELS
 
+    @FunctionalInterface
+    public interface Callback {
+        void onClick(String asset);
+    }
+
+    private static void createChooserDialog(Context context, Callback callback) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Escoge modelo");
+        builder.setNegativeButton("Cancelar", (DialogInterface dialog, int which) -> {
+            callback.onClick(null);
+        });
+        final String folder = "models";
+        final String[] nameList = new String[] {"David de Miguel Ángel", "El Pensador", "Piedad del Vaticano", "Nave (Prueba)", "Fuente de Duchamp", "Venus de Willendorf"};
+        final String[] fileList = new String[] {"david.obj", "pensador.obj", "piedad.obj", "ship.obj", "urinal.obj", "venus.obj"};
+        builder.setItems(nameList, (DialogInterface dialog, int which) -> {
+            String selectedFile = fileList[which];
+                callback.onClick(folder+"/"+selectedFile);
+        });
+        builder.create().show();
+    }
+
     private void loadModelFromAssets() {
-        AssetUtils.createChooserDialog(this, "Elige el modelo", null, "models", "(?i).*\\.(obj|stl|dae)",
+        createChooserDialog(this,
                 (String file) -> {
-                    if (file != null) {
-                        ContentUtils.provideAssets(this);
-                        launchModelRendererActivity(file);
-                    }
-                });
+            if (file != null) launchModelRendererActivity(file);
+        });
     }
 
 
     private void launchModelRendererActivity(String file) {
-        ContentUtils.provideAssets(this); /////
         Intent intent = new Intent(getApplicationContext(), ModelActivity.class);
         intent.putExtra("filename", file);
         intent.putExtra("name", models_name.get(file));

@@ -14,6 +14,7 @@ import android.support.v4.content.ContentResolverCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +35,7 @@ import conversandroid.talkback.R;
 public class ModelActivity extends AppCompatActivity {
     private static final int READ_PERMISSION_REQUEST = 100;
     private static final int OPEN_DOCUMENT_REQUEST = 101;
+    private static final String TAG = "ModelActivity";
 
     private String filename;
     private String name;
@@ -204,6 +206,7 @@ public class ModelActivity extends AppCompatActivity {
             }
             if (model != null) {
                 setCurrentModel(model);
+                startVrActivity();
             } else {
                 Toast.makeText(getApplicationContext(), R.string.open_model_error, Toast.LENGTH_SHORT).show();
                 progressBar.setVisibility(View.GONE);
@@ -237,6 +240,7 @@ public class ModelActivity extends AppCompatActivity {
     }
 
     private void startVrActivity() {
+        Log.d(TAG, "Starting...");
         if (app.getCurrentModel() == null) {
             Toast.makeText(this, R.string.view_vr_not_loaded, Toast.LENGTH_SHORT).show();
         } else {
