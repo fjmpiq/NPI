@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         app:backgroundTint="@color/colorPrimaryLight"
-        app:useCompatPadding="true"
-        app:srcCompat="@drawable/ic_google_cardboard"/>
+        app:srcCompat="@drawable/ic_google_cardboard"
+        app:useCompatPadding="true" />
 
 </FrameLayout>
