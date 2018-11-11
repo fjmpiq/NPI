@@ -340,8 +340,8 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
             callback.onClick(null);
         });
         final String folder = "models";
-        final String[] nameList = new String[] {"David de Miguel Ángel", "El Pensador", "Piedad del Vaticano", "Nave (Prueba)", "Fuente de Duchamp", "Venus de Willendorf"};
-        final String[] fileList = new String[] {"david.obj", "pensador.obj", "piedad.obj", "ship.obj", "urinal.obj", "venus.obj"};
+        final String[] nameList = new String[] {"David de Miguel Ángel", "El Pensador", "Piedad del Vaticano", "Fuente de Duchamp", "Venus de Willendorf"};
+        final String[] fileList = new String[] {"david.obj", "pensador.obj", "piedad_vaticano.obj", "urinal.obj", "venus.obj"};
         builder.setItems(nameList, (DialogInterface dialog, int which) -> {
             String selectedFile = fileList[which];
                 callback.onClick(folder+"/"+selectedFile);
