@@ -38,12 +38,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-<<<<<<< 44dca431f448ddb86722d12557018d44f161519e
 import android.text.Html;
-||||||| merged common ancestors
-=======
 import android.support.v7.app.AppCompatActivity;
->>>>>>> Usa https://github.com/dbrant/ModelViewer3D como visor 3D
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -57,9 +53,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 
 import com.google.gson.JsonElement;
-
-import org.andresoviedo.util.android.AssetUtils;
-import org.andresoviedo.util.android.ContentUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -163,8 +156,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     private static final int SCAN_REQUEST = 3;
     private final int MY_PERMISSIONS_CAMERA = 23; // Const to request permission
 
-    /////////
-    private ModelViewerApplication app;
+    private HashMap<String,String> models_name = new HashMap<>();
 
     ///////////////////////////////////////////////////////////////////////////
     // METHODS                                                               //
@@ -239,6 +231,11 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
             e.printStackTrace();
         }
 
+        models_name.put("models/venus.obj", "Venus de Willendorf");
+        models_name.put("models/david.obj", "David de Miguel Ángel");
+        models_name.put("models/piedad_vaticano.obj", "Piedad del Vaticano");
+        models_name.put("models/ship.obj", "Nave (Prueba)");
+        models_name.put("models/urinal.obj", "Fuente de Duchamp");
     }
 
     /**
@@ -328,10 +325,11 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     }
 
 
-    private void launchModelRendererActivity(String name) {
+    private void launchModelRendererActivity(String file) {
         ContentUtils.provideAssets(this); /////
-        Intent intent = new Intent(getApplicationContext(), conversandroid.ModelActivity.class);
-        intent.putExtra("name", name);
+        Intent intent = new Intent(getApplicationContext(), ModelActivity.class);
+        intent.putExtra("filename", file);
+        intent.putExtra("name", models_name.get(file));
         startActivity(intent);
     }
 

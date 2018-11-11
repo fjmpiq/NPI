@@ -1,7 +1,6 @@
 package conversandroid;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -44,6 +43,7 @@ public class ModelActivity extends AppCompatActivity {
     private static final int READ_PERMISSION_REQUEST = 100;
     private static final int OPEN_DOCUMENT_REQUEST = 101;
 
+    private String filename;
     private String name;
 
     private ModelViewerApplication app;
@@ -70,9 +70,10 @@ public class ModelActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
-            if (b.getString("name") != null) {
-                this.name = b.getString("name");
+            if (b.getString("filename") != null) {
+                this.filename = b.getString("filename");
             }
+            this.name = b.getString("name");
         }
     }
 
@@ -145,17 +146,6 @@ public class ModelActivity extends AppCompatActivity {
         }
     }
 
-    private void checkReadPermissionThenOpen() {
-        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED)
-                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    READ_PERMISSION_REQUEST);
-        } else {
-            beginOpenModel();
-        }
-    }
-
     private void beginOpenModel() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("*/*");
@@ -184,16 +174,7 @@ public class ModelActivity extends AppCompatActivity {
                 ContentResolver cr = getApplicationContext().getContentResolver();
                 String fileName = getFileName(cr, uri);
 
-                if ("http".equals(uri.getScheme()) || "https".equals(uri.getScheme())) {
-                    OkHttpClient client = new OkHttpClient();
-                    Request request = new Request.Builder().url(uri.toString()).build();
-                    Response response = client.newCall(request).execute();
-
-                    // TODO: figure out how to NOT need to read the whole file at once.
-                    stream = new ByteArrayInputStream(response.body().bytes());
-                } else {
-                    stream = cr.openInputStream(uri);
-                }
+                stream = cr.openInputStream(uri);
 
                 if (stream != null) {
                     Model model;
@@ -210,8 +191,6 @@ public class ModelActivity extends AppCompatActivity {
                         }
                         model.setTitle(fileName);
                     } else {
-                        // assume it's STL.
-                        // TODO: autodetect file type by reading contents?
                         model = new StlModel(stream);
                     }
                     return model;
@@ -269,14 +248,14 @@ public class ModelActivity extends AppCompatActivity {
         if (app.getCurrentModel() == null) {
             Toast.makeText(this, R.string.view_vr_not_loaded, Toast.LENGTH_SHORT).show();
         } else {
-            startActivity(new Intent(this, ModelGvrActivity.class));
+            startActivity(new Intent(this, ModelGvrActivity.class).putExtra("name", name));
         }
     }
 
     private void loadSampleModel() {
         try {
             InputStream stream = getApplicationContext().getAssets()
-                    .open(name);
+                    .open(filename);
             setCurrentModel(new ObjModel(stream));//StlModel(stream));
             stream.close();
         } catch (IOException e) {

@@ -1,12 +1,18 @@
 package gvr;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import conversandroid.Light;
 import conversandroid.Model;
@@ -51,46 +57,50 @@ public class ModelGvrActivity extends GvrActivity implements GvrView.StereoRende
 
     private final float[] viewMatrix = new float[16];
 
-    private static final float MODEL_BOUND_SIZE = 5f;
+    private static final float MODEL_BOUND_SIZE = 20f;
     private static final float Z_NEAR = 0.1f;
     private static final float Z_FAR = MODEL_BOUND_SIZE * 4;
 
-    private static final float YAW_LIMIT = 0.12f;
-    private static final float PITCH_LIMIT = 0.12f;
-
-    // Convenience vector for extracting the position from a matrix via multiplication.
-    private static final float[] POS_MATRIX_MULTIPLY_VEC = {0, 0, 0, 1.0f};
     private static final float RAD2DEG = 57.29577951f;
 
     private float[] finalViewMatrix = new float[16];
-    private float[] tempMatrix = new float[16];
-    private float[] tempPosition = new float[4];
     private float[] headView = new float[16];
     private float[] inverseHeadView = new float[16];
     private float[] headRotation = new float[4];
     private float[] headEulerAngles = new float[3];
 
-    private Vibrator vibrator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initializeGvrView();
-        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        String name = getIntent().getStringExtra("name");
+        addTitle(name);
     }
 
+    public void addTitle(String name){
+        TextView mTextView = new TextView(this);
+        mTextView.setText(name);
+        mTextView.setTextColor(Color.WHITE);
+        mTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 26);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.TOP| Gravity.RIGHT;
+        params.topMargin = 30;
+        params.rightMargin = 50;
+        addContentView(mTextView, params);
+    }
     public void initializeGvrView() {
         setContentView(R.layout.activity_gvr);
 
         GvrView gvrView = findViewById(R.id.gvr_view);
-        gvrView.setEGLConfigChooser(8, 8, 8, 8, 16, 8);
+        //gvrView.setEGLConfigChooser(8, 8, 8, 8, 16, 8);
 
         gvrView.setRenderer(this);
         gvrView.setTransitionViewEnabled(true);
 
         // Enable Cardboard-trigger feedback with Daydream headsets. This is a simple way of supporting
         // Daydream controller input for basic interactions using the existing Cardboard trigger API.
-        gvrView.enableCardboardTriggerEmulation();
+        //gvrView.enableCardboardTriggerEmulation();
 
         gvrView.setOnCloseButtonListener(this::finish);
 
@@ -103,6 +113,7 @@ public class ModelGvrActivity extends GvrActivity implements GvrView.StereoRende
 
         model = ModelViewerApplication.getInstance().getCurrentModel();
 
+        gvrView.setStereoModeEnabled(false);
         setGvrView(gvrView);
     }
 
@@ -200,22 +211,5 @@ public class ModelGvrActivity extends GvrActivity implements GvrView.StereoRende
     public void onFinishFrame(Viewport viewport) {}
 
     @Override
-    public void onCardboardTrigger() {
-        Log.i(TAG, "onCardboardTrigger");
-        // TODO: use for something
-    }
-
-    // TODO: use for something.
-    private boolean isLookingAtObject() {
-        if (model == null) {
-            return false;
-        }
-        // Convert object space to camera space. Use the headView from onNewFrame.
-        Matrix.multiplyMM(tempMatrix, 0, headView, 0, model.getModelMatrix(), 0);
-        Matrix.multiplyMV(tempPosition, 0, tempMatrix, 0, POS_MATRIX_MULTIPLY_VEC, 0);
-
-        float pitch = (float) Math.atan2(tempPosition[1], -tempPosition[2]);
-        float yaw = (float) Math.atan2(tempPosition[0], -tempPosition[2]);
-        return Math.abs(pitch) < PITCH_LIMIT && Math.abs(yaw) < YAW_LIMIT;
-    }
+    public void onCardboardTrigger() {}
 }
