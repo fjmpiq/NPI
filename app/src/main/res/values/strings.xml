@@ -43,6 +43,7 @@
     <!-- Colors -->
     <color name="speechbtn_default">#EEEEEE</color>
     <color name="speechbtn_listening">#99FFBB</color>
+    <color name="speechbtn_thinking">#9bc1ff</color>
     <string name="title_activity_main">MainActivity</string>
 
     <string name="hello_world">Hello world!</string>
@@ -54,4 +55,8 @@
     <string name="creditos">Musemium es una aplicación realizada por Pablo Baeyens, Francisco Morales y Jesús Sánchez a partir de los proyectos de Github
         zoraidacallejas/Chatbot, dlazaro66/QRCodeReaderView y dbrant/ModelViewer3D. \n\n Los modelos 3D se han obtenido de Scan The World.
         </string>
+    <string name="opciones">Opciones</string>
+    <string name="button3d">3D</string>
+    <string name="queryTag">Consulta:</string>
+    <string name="speechbtn_thinking">Pensando...</string>
 </resources>

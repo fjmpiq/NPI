@@ -37,6 +37,7 @@ import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -49,6 +50,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 
+import com.google.gson.JsonElement;
+
 import org.andresoviedo.util.android.AssetUtils;
 import org.andresoviedo.util.android.ContentUtils;
 import org.json.JSONArray;
@@ -56,7 +59,9 @@ import org.json.JSONException;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 
 //Check the dependencies necessary to make these imports in
@@ -98,6 +103,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
      * Access to the main TextView
      */
     private TextView queryResultTextView;
+    private TextView queryText;
 
 
     // VOICE AND TEXT
@@ -276,6 +282,8 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     private void setTextView() {
         queryResultTextView = findViewById(R.id.queryResult);
         queryResultTextView.setText(R.string.initial_textView_message);
+        queryText = findViewById(R.id.queryText);
+        findViewById(R.id.queryTextTag).setVisibility(View.INVISIBLE);
 
     }
 
@@ -478,6 +486,15 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     }
 
     /**
+     * Provides feedback to the use to show that the app is thinking
+     */
+    private void changeButtonAppearanceToThinking() {
+        Button button = findViewById(R.id.speech_btn); //Obtains a reference to the button
+        button.setText(R.string.speechbtn_thinking); //Changes the button's message to the text obtained from the resources folder
+        button.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.speechbtn_thinking), PorterDuff.Mode.MULTIPLY);  //Changes the button's background to the color obtained from the resources folder
+    }
+
+    /**
      * Provides feedback to the user (by means of a Toast and a synthesized message) when the ASR encounters an error
      */
     @Override
@@ -541,14 +558,11 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
      */
     @Override
     public void processAsrResults(ArrayList<String> nBestList, float[] nBestConfidences) {
-        if(nBestList!=null){
-
+        if(nBestList!=null && nBestList.size()>0){
             Log.d(LOGTAG, "ASR best result: " + nBestList.get(0));
-
-            if(nBestList.size()>0){
-                changeButtonAppearanceToDefault();
-                sendMsgToChatBot(nBestList.get(0)); //Send the best recognition hypothesis to the chatbot
-            }
+            queryText.setText(nBestList.get(0));
+            changeButtonAppearanceToThinking();
+            sendMsgToChatBot(nBestList.get(0)); //Send the best recognition hypothesis to the chatbot
         }
     }
 
@@ -627,7 +641,17 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         }
 
         if(!isTTSSpeaking()) {
+            findViewById(R.id.queryTextTag).setVisibility(View.VISIBLE);
             runOnUiThread(this::startListening);
+        }
+    }
+
+    @Override
+    public void onPartialResults(Bundle arg0) {
+        super.onPartialResults(arg0);
+        ArrayList<String> results = arg0.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        if(results.size() > 0){
+            queryText.setText(results.get(0));
         }
     }
 
@@ -678,11 +702,18 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
                 Log.d(LOGTAG,"Result: "+result.getResolvedQuery());
                 Log.d(LOGTAG,"Action: " + result.getAction());
 
+                if(result.getParameters().containsKey("any")){
+                    String any = result.getParameters().get("any").getAsString();
+                    String original = queryText.getText().toString();
+                    queryText.setText(Html.fromHtml(original.replace(any, "<b>" + any + "</b>")));
+                }
+
                 final String chatbotResponse = result.getFulfillment().getSpeech();
                 if (chatbotResponse.matches(".+\\.obj")) {
                     launchModelRendererActivity(Uri.parse("assets://" + getPackageName() + "/" + chatbotResponse), chatbotResponse);
                 }
                 else {
+                    changeButtonAppearanceToDefault();
                     try {
                         speak(chatbotResponse, "ES", ID_PROMPT_QUERY); //It always starts listening after talking, it is neccessary to include a special "last_exchange" intent in dialogflow and process it here
                         //so that the last system answer is synthesized using ID_PROMPT_INFO.
@@ -703,6 +734,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
 
         //final AIRequest aiRequest = new AIRequest();
         //aiRequest.setQuery(userInput);
+
 
         AsyncTask<String,Void,AIResponse> myAsyncTask = new MyAsyncTaskClass();
         myAsyncTask.execute(userInput);
@@ -768,6 +800,8 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
     private void onShake(){
         Toast toast = Toast.makeText(getApplicationContext(), R.string.onShake_toast, Toast.LENGTH_LONG);
         toast.show();
+        queryText.setText("");
+        findViewById(R.id.queryTextTag).setVisibility(View.INVISIBLE);
         String msg = randArtwork();
         sManager.unregisterListener(this, accelSensor);
         

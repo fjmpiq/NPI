@@ -177,6 +177,9 @@ public abstract class VoiceActivity extends Activity implements RecognitionListe
             // Specify language model
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, languageModel);
 
+            // Specify that we want partial results
+            intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+
             // Specify how many results to receive. Results listed in order of confidence
             intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, maxResults);
 
