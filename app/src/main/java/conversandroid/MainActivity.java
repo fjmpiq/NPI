@@ -233,6 +233,7 @@ public class MainActivity extends VoiceActivity implements SensorEventListener {
         models_name.put("models/piedad_vaticano.obj", "Piedad del Vaticano");
         models_name.put("models/ship.obj", "Nave (Prueba)");
         models_name.put("models/urinal.obj", "Fuente de Duchamp");
+        models_name.put("models/pensador.obj", "El Pensador");
     }
 
     /**
